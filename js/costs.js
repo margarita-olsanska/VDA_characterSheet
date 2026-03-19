@@ -12,16 +12,17 @@ export const costs = {
 
 	disciplines: (level, trait) => {
 
+		const slot = character.disciplines[trait]
+
+		if(!slot || !slot.name) return 0  // 🔥 ВАЖНО
+
+		const discipline = slot.name
 		const clan = clans[character.clan]
 
-		if(clan && clan.disciplines.includes(trait)){
-			// clan 
-			if(level === 0) return 10
-			return level * 5
+		if(clan && clan.disciplines.includes(discipline)){
+			return level === 0 ? 10 : level * 5
 		}else{
-			// foreign
-			if(level === 0) return 15
-			return level * 7
+			return level === 0 ? 15 : level * 7
 		}
 	},
 

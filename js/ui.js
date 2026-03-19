@@ -21,6 +21,26 @@ export function renderCosts(){
 
 		dots.forEach((dot,i) => {
 
+
+			if(type === "disciplines"){
+
+				const discipline = character.disciplines[trait]?.name
+
+				if(!discipline){
+					group.style.opacity = 0.3
+
+					// очистить отображение
+					group.querySelectorAll(".dot").forEach(dot => {
+						dot.textContent = ""
+						dot.classList.remove("cost", "filled")
+					})
+
+					return // ❗ пропускаем дальше
+				}
+
+				// если выбрана — вернуть нормальный вид
+				group.style.opacity = 1
+			}
 			dot.textContent = ""
 			dot.classList.remove("cost")
 
@@ -44,12 +64,27 @@ export function renderCosts(){
 }
 
 export function renderSheet(){
-	document.querySelectorAll(".dots").forEach(group=>{
-		const trait = group.dataset.trait
-		const value = getTraitValue(trait)
-		renderDots(group,value)
+
+	// ✅ 1. СИНХРОНИЗАЦИЯ SELECT (дисциплины)
+	document.querySelectorAll(".disciplineSelect").forEach(select => {
+
+		const slot = select.dataset.slot
+
+		if(!character.disciplines[slot]) return
+
+		select.value = character.disciplines[slot].name || ""
 	})
 
+	// ✅ 2. ОТРИСОВКА ТОЧЕК
+	document.querySelectorAll(".dots").forEach(group => {
+
+		const trait = group.dataset.trait
+		const value = getTraitValue(trait)
+
+		renderDots(group, value)
+	})
+
+	// ✅ 3. СТОИМОСТЬ
 	renderCosts()
 }
 

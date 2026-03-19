@@ -52,13 +52,12 @@ export const character = {
 	},
 
 	disciplines: {
-		celerity: 0,
-		potence: 0,
-		presence: 0,
-		auspex: 0,
-		obfuscate: 0,
-		animalism: 0,
-		vicissitude: 0
+		slot1: { name: null, level: 0 },
+		slot2: { name: null, level: 0 },
+		slot3: { name: null, level: 0 },
+		slot4: { name: null, level: 0 },
+		slot5: { name: null, level: 0 },
+		slot6: { name: null, level: 0 },
 	},
 
 	backgrounds: {

@@ -29,6 +29,20 @@ clanSelect.addEventListener("change", () => {
 	updateUI()
 })
 
+document.querySelectorAll(".disciplineSelect").forEach(select => {
+
+	select.addEventListener("change", () => {
+
+		const slot = select.dataset.slot
+		const value = select.value
+
+		character.disciplines[slot].name = value
+
+		updateUI()
+		saveCharacter()
+	})
+})
+
 document.querySelectorAll(".dots").forEach(group => {
 
 	const trait = group.dataset.trait
@@ -37,9 +51,14 @@ document.querySelectorAll(".dots").forEach(group => {
 	dots.forEach((dot,index) => {
 		dot.addEventListener("click",()=>{
 
+            console.log("CLICK:", trait, character.disciplines[trait])
 			const clickedLevel = index + 1
 			const currentLevel = getTraitValue(trait)
 			const type = getTraitType(trait)
+            
+            if(type === "disciplines" && !character.disciplines[trait].name){
+                return
+            }
 
 			// УМЕНЬШЕНИЕ
 			if(clickedLevel < currentLevel) {
