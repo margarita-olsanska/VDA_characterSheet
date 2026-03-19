@@ -11,13 +11,13 @@ export function loadCharacter() {
 
 	const data = JSON.parse(saved)
 
-	Object.assign(character.attributes, data.attributes || {})
-	Object.assign(character.abilities, data.abilities || {})
-	Object.assign(character.clanDiscipline, data.clanDiscipline || {})
-	Object.assign(character.foreignDiscipline, data.foreignDiscipline || {})
-	Object.assign(character.backgrounds, data.backgrounds || {})
-	Object.assign(character.virtues, data.virtues || {})
+    Object.assign(character.attributes, data.attributes || {})
+    Object.assign(character.abilities, data.abilities || {})
+    Object.assign(character.disciplines, data.disciplines || {})
+    Object.assign(character.backgrounds, data.backgrounds || {})
+    Object.assign(character.virtues, data.virtues || {})
 
-	character.xp = data.xp || 0
-	character.freebie = data.freebie || 0
+    character.clan = data.clan || null
+    character.xp = data.xp || 0
+    character.freebie = data.freebie || 0
 }

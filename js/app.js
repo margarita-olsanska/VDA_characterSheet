@@ -3,9 +3,11 @@ import { costs } from "./costs.js"
 import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
 import { saveCharacter, loadCharacter } from "./storage.js"
 import { renderSheet, renderResources } from "./ui.js"
+import { clans } from "./clans.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
+const clanSelect = document.getElementById("clanSelect")
 
 function updateUI(){
 	renderSheet()
@@ -20,6 +22,11 @@ xpInput.addEventListener("input", () => {
 freebieInput.addEventListener("input", () => {
 	character.freebie = parseInt(freebieInput.value) || 0
 	saveCharacter()
+})
+
+clanSelect.addEventListener("change", () => {
+	character.clan = clanSelect.value
+	updateUI()
 })
 
 document.querySelectorAll(".dots").forEach(group => {

@@ -24,15 +24,15 @@ export function renderCosts(){
 			dot.textContent = ""
 			dot.classList.remove("cost")
 
-			if(i >= current){
+			if (i >= current) {
 
 				let totalCost = 0
 
-				for(let lvl = current; lvl < i; lvl++){
-					totalCost += costs[type](lvl)
+				for (let lvl = current; lvl < i; lvl++) {
+					totalCost += costs[type](lvl, trait)
 				}
 
-				totalCost += costs[type](i)
+				totalCost += costs[type](i, trait)
 
 				dot.textContent = totalCost
 				dot.classList.add("cost")
