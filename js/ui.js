@@ -23,22 +23,20 @@ export function renderCosts(){
 
 
 			if(type === "disciplines"){
-
 				const discipline = character.disciplines[trait]?.name
 
+				// styling if discipline not selected
 				if(!discipline){
 					group.style.opacity = 0.3
-
-					// очистить отображение
+					// dits without costs
 					group.querySelectorAll(".dot").forEach(dot => {
 						dot.textContent = ""
 						dot.classList.remove("cost", "filled")
 					})
-
-					return // ❗ пропускаем дальше
+					return 
 				}
 
-				// если выбрана — вернуть нормальный вид
+				// if discipline selected - normal styling
 				group.style.opacity = 1
 			}
 			dot.textContent = ""
@@ -65,17 +63,17 @@ export function renderCosts(){
 
 export function renderSheet(){
 
-	// ✅ 1. СИНХРОНИЗАЦИЯ SELECT (дисциплины)
+	clanSelect.value = character.clan || ""
+
+	// sync disciplines
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
 		const slot = select.dataset.slot
-
 		if(!character.disciplines[slot]) return
-
 		select.value = character.disciplines[slot].name || ""
 	})
 
-	// ✅ 2. ОТРИСОВКА ТОЧЕК
+	//dots
 	document.querySelectorAll(".dots").forEach(group => {
 
 		const trait = group.dataset.trait
@@ -84,7 +82,7 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-	// ✅ 3. СТОИМОСТЬ
+	//costs
 	renderCosts()
 }
 

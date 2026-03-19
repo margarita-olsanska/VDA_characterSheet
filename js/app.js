@@ -4,6 +4,8 @@ import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
 import { saveCharacter, loadCharacter } from "./storage.js"
 import { renderSheet, renderResources } from "./ui.js"
 import { clans } from "./clans.js"
+import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
+import { disciplines } from "./disciplines.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
@@ -25,8 +27,53 @@ freebieInput.addEventListener("input", () => {
 })
 
 clanSelect.addEventListener("change", () => {
-	character.clan = clanSelect.value
+
+	const newClan = clanSelect.value
+
+	// refund all XP and clean up
+	refundAllDisciplines()
+
+	// then change the clan
+	character.clan = newClan
+
+	// then add new clan disciplines
+	fillClanDisciplines()
+
 	updateUI()
+	saveCharacter()
+})
+
+
+//empty
+const empty = document.createElement("option")
+empty.value = ""
+empty.textContent = "-- Выберите клан --"
+clanSelect.appendChild(empty)
+
+// all clans
+for(const key in clans){
+
+	const option = document.createElement("option")
+	option.value = key                  // brujah
+	option.textContent = clans[key].name // "Бруха"
+
+	clanSelect.appendChild(option)
+}
+
+document.querySelectorAll(".disciplineSelect").forEach(select => {
+
+	//empty
+	const empty = document.createElement("option")
+	empty.value = ""
+	empty.textContent = "--"
+	select.appendChild(empty)
+
+	for(const key in disciplines){
+		const option = document.createElement("option")
+		option.value = key
+		option.textContent = disciplines[key] // russian text
+		select.appendChild(option)
+	}
 })
 
 document.querySelectorAll(".disciplineSelect").forEach(select => {
@@ -60,13 +107,13 @@ document.querySelectorAll(".dots").forEach(group => {
                 return
             }
 
-			// УМЕНЬШЕНИЕ
+			// dots increment
 			if(clickedLevel < currentLevel) {
 
 				let refund = 0
 
 				for(let lvl = currentLevel - 1; lvl >= clickedLevel; lvl--){
-					refund += costs[type](lvl)
+					refund += costs[type](lvl, trait)
 				}
 
 				setTraitValue(trait, clickedLevel)
@@ -77,13 +124,13 @@ document.querySelectorAll(".dots").forEach(group => {
 				return
 			}
 
-			// УВЕЛИЧЕНИЕ 
+			// dots decrement 
 			if(clickedLevel > currentLevel) {
 
 				let totalCost = 0
 
 				for(let lvl = currentLevel; lvl < clickedLevel; lvl++){
-					totalCost += costs[type](lvl)
+					totalCost += costs[type](lvl, trait)
 				}
 
 				if(character.xp >= totalCost){
@@ -101,11 +148,11 @@ document.querySelectorAll(".dots").forEach(group => {
 				return
 			}
 
-			// Клик по текущей точке (−1 уровень)
+			// clicking on dot -> uncheck
 			if(clickedLevel === currentLevel) {
 
 				const refundLevel = currentLevel - 1
-				const refund = costs[type](refundLevel)
+				const refund = costs[type](refundLevel, trait)
 
 				setTraitValue(trait, refundLevel)
 				character.xp += refund

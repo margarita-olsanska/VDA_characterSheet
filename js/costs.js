@@ -14,7 +14,7 @@ export const costs = {
 
 		const slot = character.disciplines[trait]
 
-		if(!slot || !slot.name) return 0  // 🔥 ВАЖНО
+		if(!slot || !slot.name) return 0  
 
 		const discipline = slot.name
 		const clan = clans[character.clan]

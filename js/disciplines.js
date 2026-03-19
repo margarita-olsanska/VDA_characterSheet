@@ -1,0 +1,21 @@
+export const disciplines = {
+	animalism: "Анимализм",
+	auspex: "Ясновидение",
+	celerity: "Стремительность",
+	dementation: "Помешательство",
+	domination: "Доминирование",
+	fortitude: "Стойкость",
+	obfuscate: "Сокрытие",
+	potence: "Мощь",
+	presence: "Величие",
+	protean: "Метаморфозы",
+	thaumaturgy: "Тауматургия",
+	quietus: "Упокоение",
+	serpentis: "Серпентис",
+	vicissitude: "Преображение",
+	chimerstry: "Химерия",
+	necromancy: "Некромантия",
+	obtenebration: "Затемнение",
+	demonion: "Демонион",
+	valeren: "Валерен"
+}
