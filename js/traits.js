@@ -4,8 +4,7 @@ export function getTraitType(trait) {
 
 	if(character.attributes[trait] !== undefined) return "attributes"
 	if(character.abilities[trait] !== undefined) return "abilities"
-	if(character.clanDiscipline[trait] !== undefined) return "clanDiscipline"
-	if(character.foreignDiscipline[trait] !== undefined) return "foreignDiscipline"
+    if(character.disciplines[trait] !== undefined) return "disciplines"
 	if(character.backgrounds[trait] !== undefined) return "backgrounds"
 	if(character.virtues[trait] !== undefined) return "virtues"
 
@@ -16,11 +15,26 @@ export function getTraitType(trait) {
 export function getTraitValue(trait) {
 
 	const type = getTraitType(trait)
-	return type ? character[type][trait] : 0
+
+	if(type === "disciplines"){
+		return character.disciplines[trait].level
+	}
+
+	if(!type || !character[type]) return 0
+
+	return character[type][trait] ?? 0
 }
 
 export function setTraitValue(trait, value) {
 
 	const type = getTraitType(trait)
-	if(type) character[type][trait] = value
+
+	if(type === "disciplines"){
+		character.disciplines[trait].level = value
+		return
+	}
+
+	if(type && character[type]){
+		character[type][trait] = value
+	}
 }

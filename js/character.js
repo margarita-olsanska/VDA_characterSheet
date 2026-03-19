@@ -1,4 +1,7 @@
 export const character = {
+
+	clan: null,
+
 	attributes: {
 		strength: 1,
 		dexterity: 1,
@@ -48,16 +51,13 @@ export const character = {
 		theology: 0
 	},
 
-	clanDiscipline: {
-		clanDiscipline1: 0,
-		clanDiscipline2: 0,
-		clanDiscipline3: 0,
-	},
-
-	foreignDiscipline: {
-		foreignDiscipline1: 0,
-		foreignDiscipline2: 0,
-		foreignDiscipline3: 0,
+	disciplines: {
+		slot1: { name: null, level: 0 },
+		slot2: { name: null, level: 0 },
+		slot3: { name: null, level: 0 },
+		slot4: { name: null, level: 0 },
+		slot5: { name: null, level: 0 },
+		slot6: { name: null, level: 0 },
 	},
 
 	backgrounds: {
@@ -68,7 +68,7 @@ export const character = {
 		background5: 0,
 		background6: 0,
 	},
-	
+
 	virtues: {
 		virtue1: 1,
 		virtue2: 1,

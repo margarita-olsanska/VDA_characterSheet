@@ -21,18 +21,36 @@ export function renderCosts(){
 
 		dots.forEach((dot,i) => {
 
+
+			if(type === "disciplines"){
+				const discipline = character.disciplines[trait]?.name
+
+				// styling if discipline not selected
+				if(!discipline){
+					group.style.opacity = 0.3
+					// dits without costs
+					group.querySelectorAll(".dot").forEach(dot => {
+						dot.textContent = ""
+						dot.classList.remove("cost", "filled")
+					})
+					return 
+				}
+
+				// if discipline selected - normal styling
+				group.style.opacity = 1
+			}
 			dot.textContent = ""
 			dot.classList.remove("cost")
 
-			if(i >= current){
+			if (i >= current) {
 
 				let totalCost = 0
 
-				for(let lvl = current; lvl < i; lvl++){
-					totalCost += costs[type](lvl)
+				for (let lvl = current; lvl < i; lvl++) {
+					totalCost += costs[type](lvl, trait)
 				}
 
-				totalCost += costs[type](i)
+				totalCost += costs[type](i, trait)
 
 				dot.textContent = totalCost
 				dot.classList.add("cost")
@@ -44,12 +62,27 @@ export function renderCosts(){
 }
 
 export function renderSheet(){
-	document.querySelectorAll(".dots").forEach(group=>{
-		const trait = group.dataset.trait
-		const value = getTraitValue(trait)
-		renderDots(group,value)
+
+	clanSelect.value = character.clan || ""
+
+	// sync disciplines
+	document.querySelectorAll(".disciplineSelect").forEach(select => {
+
+		const slot = select.dataset.slot
+		if(!character.disciplines[slot]) return
+		select.value = character.disciplines[slot].name || ""
 	})
 
+	//dots
+	document.querySelectorAll(".dots").forEach(group => {
+
+		const trait = group.dataset.trait
+		const value = getTraitValue(trait)
+
+		renderDots(group, value)
+	})
+
+	//costs
 	renderCosts()
 }
 

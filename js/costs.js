@@ -1,3 +1,6 @@
+import { character } from "./character.js"
+import { clans } from "./clans.js"
+
 export const costs = {
 
 	attributes: level => level * 4,
@@ -7,14 +10,20 @@ export const costs = {
 		return level * 2
 	},
 
-	clanDiscipline: level => {
-		if(level === 0) return 10
-		return level * 5
-	},
+	disciplines: (level, trait) => {
 
-	foreignDiscipline: level => {
-		if(level === 0) return 15
-		return level * 7
+		const slot = character.disciplines[trait]
+
+		if(!slot || !slot.name) return 0  
+
+		const discipline = slot.name
+		const clan = clans[character.clan]
+
+		if(clan && clan.disciplines.includes(discipline)){
+			return level === 0 ? 10 : level * 5
+		}else{
+			return level === 0 ? 15 : level * 7
+		}
 	},
 
 	backgrounds: level => {
