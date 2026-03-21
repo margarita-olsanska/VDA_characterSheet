@@ -1,3 +1,5 @@
+import { AppState } from "./state.js"
+
 export const character = {
 
 	clan: null,
@@ -86,4 +88,10 @@ export const character = {
 
 	xp: 0,
 	freebie: 0,
+
+	creation: {
+		active: true,
+		stage: "attributes",
+	}
 }
+

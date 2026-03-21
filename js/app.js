@@ -2,7 +2,7 @@ import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
 import { saveCharacter, loadCharacter } from "./storage.js"
-import { renderSheet, renderResources } from "./ui.js"
+import { renderSheet, renderResources, renderCreation  } from "./ui.js"
 import { clans } from "./clans.js"
 import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
@@ -14,6 +14,7 @@ const clanSelect = document.getElementById("clanSelect")
 function updateUI(){
 	renderSheet()
 	renderResources(xpInput, freebieInput)
+	renderCreation()
 }
 
 xpInput.addEventListener("input", () => {

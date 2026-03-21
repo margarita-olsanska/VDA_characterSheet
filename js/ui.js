@@ -1,6 +1,7 @@
 import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, getTraitType } from "./traits.js"
+import { creationState } from "./creation.js"
 
 export function renderDots(group, value){
 	const dots = group.querySelectorAll(".dot")
@@ -89,4 +90,13 @@ export function renderSheet(){
 export function renderResources(xpInput, freebieInput){
 	xpInput.value = character.xp
 	freebieInput.value = character.freebie
+}
+
+export function renderCreation(){
+
+	const el = document.getElementById("creationInfo")
+
+	if(!el) return
+
+	el.textContent = `Атрибуты: ${creationState.attributes.used}/${creationState.attributes.primary + creationState.attributes.secondary + creationState.attributes.tertiary}`
 }

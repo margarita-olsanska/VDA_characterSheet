@@ -45,3 +45,36 @@ export function refundAllDisciplines(){
 
 	character.xp += refund
 }
+
+export function applyUpgrade(trait, targetLevel) {
+
+	// 🔥 ВОТ СЮДА
+	if(character.creation?.active){
+		return applyCreationUpgrade(trait, targetLevel)
+	}
+
+	const current = getTraitValue(trait)
+	const type = getTraitType(trait)
+
+	let totalCost = 0
+
+	if(targetLevel > current){
+
+		for(let lvl = current; lvl < targetLevel; lvl++){
+			totalCost += costs[type](lvl, trait)
+		}
+
+		if(character.xp < totalCost){
+			return { success: false }
+		}
+
+		character.xp -= totalCost
+		setTraitValue(trait, targetLevel)
+	}
+
+	if(targetLevel < current){
+		// логика возврата XP
+	}
+
+	return { success: true }
+}
