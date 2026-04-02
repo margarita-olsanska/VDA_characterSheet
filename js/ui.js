@@ -1,6 +1,9 @@
 import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, getTraitType } from "./traits.js"
+import { getState, STATES, currentState } from "./state.js"
+
+document.body.dataset.state = getState()
 
 export function renderDots(group, value){
 	const dots = group.querySelectorAll(".dot")

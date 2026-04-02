@@ -6,10 +6,18 @@ import { renderSheet, renderResources } from "./ui.js"
 import { clans } from "./clans.js"
 import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
+import { getState, setState, STATES, currentState } from "./state.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
+const editBtn = document.getElementById("editModeBtn")
+
+editBtn.addEventListener("click", () => {
+	console.log("CURRENT STATE:", getState())
+	setState(STATES.EDIT)
+	updateUI()
+})
 
 function updateUI(){
 	renderSheet()
@@ -97,7 +105,9 @@ document.querySelectorAll(".dots").forEach(group => {
 
 	dots.forEach((dot,index) => {
 		dot.addEventListener("click",()=>{
-
+			if(getState() !== STATES.EDIT){
+				return
+			}
             console.log("CLICK:", trait, character.disciplines[trait])
 			const clickedLevel = index + 1
 			const currentLevel = getTraitValue(trait)
