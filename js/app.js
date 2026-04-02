@@ -144,6 +144,23 @@ document.querySelectorAll(".dots").forEach(group => {
 	})
 })
 
+document.querySelectorAll(".willpowerCurrent input").forEach((cb, index) => {
+
+	cb.addEventListener("click", () => {
+
+		const newValue = index + 1
+
+		if(cb.checked){
+			character.willpower.current = newValue
+		}else{
+			character.willpower.current = index
+		}
+
+		saveCharacter()
+		updateUI()
+	})
+})
+
 
 loadCharacter()
 updateUI()

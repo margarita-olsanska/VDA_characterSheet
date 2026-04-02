@@ -75,11 +75,18 @@ export const character = {
 		virtue3: 1
 	},
 
+	road: {
+		name: "",
+		level: 1
+	},
+
+	willpower: {
+		level: 1,
+		current: 1
+	},
+
 	bloodPoints: 0,
 	maxBloodPoints: 1,
-
-	willpowerPoints: 0,
-	maxWillpowerPoints: 1,
 
 	healthPoints: 0,
 	maxHealthPoints: 1,

@@ -21,5 +21,8 @@ export const freebieCosts = {
 		}else{
 			return 100  // foreign -- TODO: manage this correctly
 		}
-	}
+	},
+
+    road: () =>  2,
+    willpower: () => 1
 }

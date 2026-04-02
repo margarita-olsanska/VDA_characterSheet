@@ -32,5 +32,9 @@ export const costs = {
 
 	virtues: level => {
 		return level * 2
-    }
+    },
+
+	road: level => level * 2,
+	
+	willpower: level => level
 }

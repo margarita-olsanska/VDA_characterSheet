@@ -72,6 +72,20 @@ export function renderCosts(){
 	})
 }
 
+export function renderWillpower(){
+
+	const checkboxes = document.querySelectorAll(".willpowerCurrent input")
+
+	checkboxes.forEach((cb, i) => {
+
+		// show only max boxes
+		cb.style.display = i < character.willpower.level ? "" : "none"
+
+		// check all
+		cb.checked = i < character.willpower.current
+	})
+}
+
 export function renderSheet(){
 
 	clanSelect.value = character.clan || ""
@@ -93,8 +107,9 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-	//costs
 	renderCosts()
+	renderWillpower()
+	
 }
 
 export function renderResources(xpInput, freebieInput){
