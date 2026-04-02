@@ -5,9 +5,6 @@ import { getTraitValue, getTraitType } from "./traits.js"
 import { getState, STATES } from "./state.js"
 import { generationData } from "./generation.js"
 
-
-document.body.dataset.state = getState()
-
 function getMaxDots(type){
 
 	if(type === "willpower" || type === "road"){
@@ -42,7 +39,7 @@ function getCostFunction(type){
 			return (lvl, trait) => costs[type](lvl, trait)
 
 		case STATES.FREEBIE:
-			return (lvl, trait) => freebieCosts[type](lvl, trait)
+			return (lvl, trait) => freebieCosts[type](lvl, trait, character)
 
 		default:
 			return () => 0
@@ -50,6 +47,13 @@ function getCostFunction(type){
 }
 
 export function renderCosts(){
+
+	const state = getState()
+
+	if(state !== STATES.EDIT && state !== STATES.FREEBIE){
+		return
+	}
+
 	document.querySelectorAll(".dots").forEach(group => {
 
 	const trait = group.dataset.trait
@@ -58,7 +62,6 @@ export function renderCosts(){
 	if(!type) return
 
 		const costFunc = getCostFunction(type)
-
 		const dots = group.querySelectorAll(".dot")
 		const current = getTraitValue(trait)
 
@@ -96,10 +99,7 @@ export function renderWillpower(){
 
 	checkboxes.forEach((cb, i) => {
 
-		// show only max boxes
-		cb.style.display = i < character.willpower.level ? "" : "none"
-
-		// check all
+		cb.style.display = i < character.willpower.max ? "" : "none"
 		cb.checked = i < character.willpower.current
 	})
 }
@@ -121,10 +121,11 @@ export function renderBlood(){
 export function renderBloodInfo(){
 
 	const info = document.getElementById("bloodInfo")
-	const gen = character.generation
-	const data = generationData[gen]
+	const data = generationData[character.generation]
 
-	info.textContent = `Макс: ${data.bloodPool} | За ход: ${data.perTurn}`
+	if(info){
+		info.textContent = `Макс: ${data.bloodPool} | За ход: ${data.perTurn}`
+	}
 }
 
 export function renderSheet(){
@@ -136,7 +137,11 @@ export function renderSheet(){
 		clanSelect.value = character.clan || ""
 	}
 
-	
+	const genSelect = document.getElementById("generationSelect")
+	if(genSelect){
+		genSelect.value = character.generation
+	}
+
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
 		const slot = select.dataset.slot
@@ -154,7 +159,6 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-
 	renderCosts()
 	renderWillpower()
 	renderBlood()
@@ -162,6 +166,12 @@ export function renderSheet(){
 }
 
 export function renderResources(xpInput, freebieInput){
-	xpInput.value = character.xp
-	freebieInput.value = character.freebie
+
+	if(xpInput){
+		xpInput.value = character.xp
+	}
+
+	if(freebieInput){
+		freebieInput.value = character.freebie
+	}
 }

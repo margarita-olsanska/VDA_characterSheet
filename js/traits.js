@@ -1,65 +1,106 @@
 import { character } from "./character.js"
 
-export function getTraitType(trait) {
+export function getTraitType(trait){
 
-	if(character.attributes[trait] !== undefined) return "attributes"
-	if(character.abilities[trait] !== undefined) return "abilities"
-    if(character.disciplines[trait] !== undefined) return "disciplines"
-	if(character.backgrounds[trait] !== undefined) return "backgrounds"
-	if(character.virtues[trait] !== undefined) return "virtues"
+	for(const cat in character.attributes){
+		if(character.attributes[cat][trait] !== undefined){
+			return "attributes"
+		}
+	}
+
+	for(const cat in character.abilities){
+		if(character.abilities[cat][trait] !== undefined){
+			return "abilities"
+		}
+	}
+
+	if(character.disciplines?.[trait]) return "disciplines"
+	if(character.backgrounds?.[trait] !== undefined) return "backgrounds"
+	if(character.virtues?.[trait] !== undefined) return "virtues"
+
 	if(trait === "road") return "road"
 	if(trait === "willpower") return "willpower"
 
-	console.warn("Unknown trait:", trait)
 	return null
 }
 
-export function getTraitValue(trait) {
+export function getTraitValue(trait){
 
-	const type = getTraitType(trait)
+	// attributes
+	for(const cat in character.attributes){
+		if(character.attributes[cat][trait] !== undefined){
+			return character.attributes[cat][trait]
+		}
+	}
 
-	if(type === "disciplines"){
+	// abilities
+	for(const cat in character.abilities){
+		if(character.abilities[cat][trait] !== undefined){
+			return character.abilities[cat][trait]
+		}
+	}
+
+	// остальное как было
+	if(character.disciplines?.[trait])
 		return character.disciplines[trait].level
-	}
 
-	if(!type || !character[type]) return 0
+	if(character.backgrounds?.[trait] !== undefined)
+		return character.backgrounds[trait]
 
-	if(type === "road"){
+	if(character.virtues?.[trait] !== undefined)
+		return character.virtues[trait]
+
+	if(trait === "road")
 		return character.road.level
-	}
 
-	if(type === "willpower"){
-		return character.willpower.level
-	}
+	if(trait === "willpower")
+		return character.willpower.max
 
-	return character[type][trait] ?? 0
+	return 0
 }
 
-export function setTraitValue(trait, value) {
 
-	const type = getTraitType(trait)
+export function setTraitValue(trait, value){
 
-	if(type === "disciplines"){
+	// attributes
+	for(const cat in character.attributes){
+		if(character.attributes[cat][trait] !== undefined){
+			character.attributes[cat][trait] = value
+			return
+		}
+	}
+
+	// abilities
+	for(const cat in character.abilities){
+		if(character.abilities[cat][trait] !== undefined){
+			character.abilities[cat][trait] = value
+			return
+		}
+	}
+
+	// остальное
+	if(character.disciplines?.[trait]){
 		character.disciplines[trait].level = value
 		return
 	}
 
-	if(type && character[type]){
-		character[type][trait] = value
+	if(character.backgrounds?.[trait] !== undefined){
+		character.backgrounds[trait] = value
+		return
 	}
 
-	if(type === "road"){
+	if(character.virtues?.[trait] !== undefined){
+		character.virtues[trait] = value
+		return
+	}
+
+	if(trait === "road"){
 		character.road.level = value
 		return
 	}
 
-	if(type === "willpower"){
-		character.willpower.level = value
-
-		if(character.willpower.current > value){
-			character.willpower.current = value
-		}
-
-	return
-}
+	if(trait === "willpower"){
+		character.willpower.max = value
+		return
+	}
 }

@@ -3,52 +3,61 @@ export const character = {
 	clan: null,
 
 	attributes: {
-		strength: 1,
-		dexterity: 1,
-		stamina: 1,
-
-		charisma: 1,
-		manipulation: 1,
-		composure: 1,
-
-		wits: 1,
-		intelligence: 1,
-		resolve: 1
+		physical: { 
+			strength: 1, 
+			dexterity: 1, 
+			stamina: 1 
+		}, 
+		social:{ 
+			charisma: 1, 
+			manipulation: 1, 
+			composure: 1 
+		}, 
+		mental: { 
+			wits: 1, 
+			intelligence: 1, 
+			resolve: 1 
+		}
 	},
 
 	abilities: {
-		athletics: 0,
-		alertness: 0,
-		brawl: 0,
-		intimidation: 0,
-		expression: 0,
-		leadership: 0,
-		legerdemain: 0,
-		subterfuge: 0,
-		awareness: 0,
-		empathy: 0,
 
-		archery: 0,
-		commerce: 0,
-		survival: 0,
-		performance: 0,
-		ride: 0,
-		animalKen: 0,
-		crafts: 0,
-		stealth: 0,
-		melee: 0,
-		etiquette: 0,
-		
-		academics: 0,
-		law: 0,
-		medicine: 0,
-		occult: 0,
-		politics: 0,
-		investigation: 0,
-		enigmas: 0,
-		hearthWisdom: 0,
-		seneschal: 0,
-		theology: 0
+		talents: {	
+			athletics: 0,
+			alertness: 0,
+			brawl: 0,
+			intimidation: 0,
+			expression: 0,
+			leadership: 0,
+			legerdemain: 0,
+			subterfuge: 0,
+			awareness: 0,
+			empathy: 0,
+		},
+		skills: {
+			archery: 0,
+			commerce: 0,
+			survival: 0,
+			performance: 0,
+			ride: 0,
+			animalKen: 0,
+			crafts: 0,
+			stealth: 0,
+			melee: 0,
+			etiquette: 0
+		},
+		knowledges: {
+			academics: 0,
+			law: 0,
+			medicine: 0,
+			occult: 0,
+			politics: 0,
+			investigation: 0,
+			enigmas: 0,
+			hearthWisdom: 0,
+			seneschal: 0,
+			theology: 0
+		}
 	},
 
 	disciplines: {

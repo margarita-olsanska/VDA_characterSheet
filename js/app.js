@@ -8,27 +8,40 @@ import { getState, setState, STATES, currentState } from "./state.js"
 import { updateXP } from "./editLogic.js"
 import { updateFreebie } from "./freebieLogic.js"
 import { generationData } from "./generation.js"
+import { updateCreate } from "./createLogic.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
-const editBtn = document.getElementById("editModeBtn")
-const freebieBtn = document.getElementById("freebieModeBtn")
 const genSelect = document.getElementById("generationSelect")
+
+const createBtn = document.getElementById("createModeBtn")
+const freebieBtn = document.getElementById("freebieModeBtn")
+const editBtn = document.getElementById("editModeBtn")
+const viewBtn = document.getElementById("viewModeBtn")
 
 function updateUI(){
 	renderSheet()
 	renderResources(xpInput, freebieInput)
 }
 
+createBtn.addEventListener("click", () => {
+	console.log("CURRENT STATE:", getState())
+	setState(STATES.CREATE)
+	updateUI()
+})
+freebieBtn.addEventListener("click", () => {
+	setState(STATES.FREEBIE)
+	updateUI()
+})
 editBtn.addEventListener("click", () => {
 	console.log("CURRENT STATE:", getState())
 	setState(STATES.EDIT)
 	updateUI()
 })
-
-freebieBtn.addEventListener("click", () => {
-	setState(STATES.FREEBIE)
+viewBtn.addEventListener("click", () => {
+	console.log("CURRENT STATE:", getState())
+	setState(STATES.VIEW)
 	updateUI()
 })
 
@@ -134,11 +147,11 @@ function handleXP(trait, level){
 		case STATES.FREEBIE:
 			return updateFreebie(trait, level)
 
-		// case STATES.CREATE:
-		// 	return createXP(trait, level)
+		case STATES.CREATE:
+			return updateCreate(trait, level)
 
 		default:
-			return // ничего не делаем
+			return
 	}
 }
 
