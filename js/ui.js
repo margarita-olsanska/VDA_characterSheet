@@ -1,6 +1,10 @@
 import { character } from "./character.js"
 import { costs } from "./costs.js"
+import { freebieCosts } from "./freebieCosts.js"
 import { getTraitValue, getTraitType } from "./traits.js"
+import { getState, STATES, currentState } from "./state.js"
+
+document.body.dataset.state = getState()
 
 export function renderDots(group, value){
 	const dots = group.querySelectorAll(".dot")
@@ -10,54 +14,75 @@ export function renderDots(group, value){
 	})
 }
 
+function getCostFunction(type){
+
+	const state = getState()
+
+	switch(state){
+
+		case STATES.EDIT:
+			return (lvl, trait) => costs[type](lvl, trait)
+
+		case STATES.FREEBIE:
+			return (lvl, trait) => freebieCosts[type](lvl, trait)
+
+		default:
+			return () => 0
+	}
+}
+
 export function renderCosts(){
 	document.querySelectorAll(".dots").forEach(group => {
 
-		const trait = group.dataset.trait
-		const dots = group.querySelectorAll(".dot")
+	const trait = group.dataset.trait
+	const type = getTraitType(trait)
 
+	if(!type) return
+
+		const costFunc = getCostFunction(type)
+
+		const dots = group.querySelectorAll(".dot")
 		const current = getTraitValue(trait)
-		const type = getTraitType(trait)
 
 		dots.forEach((dot,i) => {
 
-
-			if(type === "disciplines"){
-				const discipline = character.disciplines[trait]?.name
-
-				// styling if discipline not selected
-				if(!discipline){
-					group.style.opacity = 0.3
-					// dits without costs
-					group.querySelectorAll(".dot").forEach(dot => {
-						dot.textContent = ""
-						dot.classList.remove("cost", "filled")
-					})
-					return 
-				}
-
-				// if discipline selected - normal styling
-				group.style.opacity = 1
-			}
 			dot.textContent = ""
 			dot.classList.remove("cost")
 
-			if (i >= current) {
+			if(i >= current){
 
 				let totalCost = 0
 
-				for (let lvl = current; lvl < i; lvl++) {
-					totalCost += costs[type](lvl, trait)
+				for(let lvl = current; lvl < i; lvl++){
+					totalCost += costFunc(lvl, trait)
 				}
 
-				totalCost += costs[type](i, trait)
+				totalCost += costFunc(i, trait)
 
 				dot.textContent = totalCost
 				dot.classList.add("cost")
 
-				dot.style.color = character.xp < totalCost ? "red" : "green"
+				const resource = getState() === STATES.FREEBIE
+					? character.freebie
+					: character.xp
+
+				dot.style.color = resource < totalCost ? "red" : "green"
 			}
 		})
+	})
+}
+
+export function renderWillpower(){
+
+	const checkboxes = document.querySelectorAll(".willpowerCurrent input")
+
+	checkboxes.forEach((cb, i) => {
+
+		// show only max boxes
+		cb.style.display = i < character.willpower.level ? "" : "none"
+
+		// check all
+		cb.checked = i < character.willpower.current
 	})
 }
 
@@ -82,8 +107,9 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-	//costs
 	renderCosts()
+	renderWillpower()
+	
 }
 
 export function renderResources(xpInput, freebieInput){
