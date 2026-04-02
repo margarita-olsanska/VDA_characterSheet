@@ -9,7 +9,7 @@ export let currentState = STATES.VIEW
 
 export function setState(newState){
 	currentState = newState
-	console.log("STATE:", getState())
+	console.log("NEW STATE SET:", getState())
 }
 
 export function getState(){

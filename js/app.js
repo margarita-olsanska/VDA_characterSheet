@@ -8,15 +8,22 @@ import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
 import { getState, setState, STATES, currentState } from "./state.js"
 import { updateXP } from "./editLogic.js"
+import { updateFreebie } from "./freebieLogic.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
 const editBtn = document.getElementById("editModeBtn")
+const freebieBtn = document.getElementById("freebieModeBtn")
 
 editBtn.addEventListener("click", () => {
 	console.log("CURRENT STATE:", getState())
 	setState(STATES.EDIT)
+	updateUI()
+})
+
+freebieBtn.addEventListener("click", () => {
+	setState(STATES.FREEBIE)
 	updateUI()
 })
 
@@ -106,8 +113,8 @@ function handleXP(trait, level){
 		case STATES.EDIT:
 			return updateXP(trait, level)
 
-		// case STATES.FREEBIE:
-		// 	return freebieXP(trait, level)
+		case STATES.FREEBIE:
+			return updateFreebie(trait, level)
 
 		// case STATES.CREATE:
 		// 	return createXP(trait, level)
