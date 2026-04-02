@@ -108,11 +108,11 @@ export function renderChecklist(){
 	const abilMax = checkAbilityMax()
 
 	const html = `
-	<div>Характеристики: ${attr.values.join("/")} / 7/5/3
+	<div>Характеристики: ${attr.values.join("/")} Требуется: 7/5/3
 		<span class="${attr.ok ? "ok":"fail"}">${attr.ok ? "✔":"✖"}</span>
 	</div>
 
-	<div>Способности: ${abil.values.join("/")} / 13/9/5
+	<div>Способности: ${abil.values.join("/")} Требуется: 13/9/5
 		<span class="${abil.ok ? "ok":"fail"}">${abil.ok ? "✔":"✖"}</span>
 	</div>
 

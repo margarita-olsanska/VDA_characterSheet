@@ -129,10 +129,8 @@ function updateDerivedStats(){
 	const selfControl = character.virtues.virtue2
 	const courage = character.virtues.virtue3
 
-	// 🛤 дорога
 	character.road.level = conscience + selfControl
 
-	// 💪 воля
 	character.willpower.max = courage
 
 	if(character.willpower.current > courage){

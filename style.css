@@ -6,6 +6,59 @@ justify-content:center;
 padding:30px;
 }
 
+.top-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.mode-tabs {
+	display: flex;
+	gap: 5px;
+}
+
+.mode-tabs button {
+	border: 1px solid #800000;
+	background: white;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+/* активная вкладка */
+body[data-state="create"] #createModeBtn,
+body[data-state="freebie"] #freebieModeBtn,
+body[data-state="edit"] #editModeBtn,
+body[data-state="view"] #viewModeBtn {
+	background: #800000;
+	color: white;
+}
+
+.resource-tabs {
+	display: flex;
+	gap: 10px;
+	margin-top: 10px;
+}
+
+.resource {
+	border: 1px solid #800000;
+	padding: 5px 10px;
+	background: #f8f8f8;
+}
+
+/* скрытие */
+body[data-state="edit"] .freebie {
+	display: none;
+}
+
+body[data-state="freebie"] .xp {
+	display: none;
+}
+
+body[data-state="create"] .resource,
+body[data-state="view"] .resource {
+	display: none;
+}
+
 .checklist {
 	border: 1px solid #555;
 	padding: 10px;

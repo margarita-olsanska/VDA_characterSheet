@@ -11,22 +11,28 @@
 
 			<div id="createChecklist" class="checklist"></div>
 
-			<div class="resources">
-				<label>
-				XP
-				<input type="number" id="xpInput">
-				</label>
+			<div class="top-bar">
+				<div class="left-info">
+					<!-- тут чеклист -->
+					<div id="createChecklist"></div>
+				</div>
 
-				<label>
-				Freebie
-				<input type="number" id="freebieInput">
-				</label>
+				<div class="mode-tabs">
+					<button id="createModeBtn">Create</button>
+					<button id="freebieModeBtn">Freebie</button>
+					<button id="editModeBtn">Edit</button>
+					<button id="viewModeBtn">View</button>
+				</div>
 			</div>
 
-			<button id="createModeBtn">Create Mode</button>
-			<button id="freebieModeBtn">Freebie Mode</button>
-			<button id="editModeBtn">Edit Mode</button>
-			<button id="viewModeBtn">View Mode</button>
+			<div class="resource-tabs">
+				<div class="resource xp">
+					XP <input type="number" id="xpInput">
+				</div>
+				<div class="resource freebie">
+					Freebie <input type="number" id="freebieInput">
+				</div>
+			</div>
 
 			<section class="top">
 				<div>
