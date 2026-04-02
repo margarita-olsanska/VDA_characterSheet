@@ -85,8 +85,12 @@ export const character = {
 		current: 1
 	},
 
-	bloodPoints: 0,
-	maxBloodPoints: 1,
+	generation: 12,
+
+	blood: {
+		max: 11,
+		current: 10
+	},
 
 	healthPoints: 0,
 	maxHealthPoints: 1,

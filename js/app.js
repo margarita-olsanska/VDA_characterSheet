@@ -9,12 +9,19 @@ import { disciplines } from "./disciplines.js"
 import { getState, setState, STATES, currentState } from "./state.js"
 import { updateXP } from "./editLogic.js"
 import { updateFreebie } from "./freebieLogic.js"
+import { generationData } from "./generation.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
 const editBtn = document.getElementById("editModeBtn")
 const freebieBtn = document.getElementById("freebieModeBtn")
+const genSelect = document.getElementById("generationSelect")
+
+function updateUI(){
+	renderSheet()
+	renderResources(xpInput, freebieInput)
+}
 
 editBtn.addEventListener("click", () => {
 	console.log("CURRENT STATE:", getState())
@@ -27,10 +34,25 @@ freebieBtn.addEventListener("click", () => {
 	updateUI()
 })
 
-function updateUI(){
-	renderSheet()
-	renderResources(xpInput, freebieInput)
-}
+genSelect.addEventListener("change", () => {
+
+	const gen = parseInt(genSelect.value)
+	character.generation = gen
+
+	const data = generationData[gen]
+
+	// обновляем кровь
+	character.blood.max = data.bloodPool
+
+	if(character.blood.current > data.bloodPool){
+		character.blood.current = data.bloodPool
+	}
+
+	updateUI()
+	saveCharacter()
+})
+
+
 
 xpInput.addEventListener("input", () => {
 	character.xp = parseInt(xpInput.value) || 0
@@ -144,22 +166,7 @@ document.querySelectorAll(".dots").forEach(group => {
 	})
 })
 
-document.querySelectorAll(".willpowerCurrent input").forEach((cb, index) => {
 
-	cb.addEventListener("click", () => {
-
-		const newValue = index + 1
-
-		if(cb.checked){
-			character.willpower.current = newValue
-		}else{
-			character.willpower.current = index
-		}
-
-		saveCharacter()
-		updateUI()
-	})
-})
 
 
 loadCharacter()

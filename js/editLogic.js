@@ -1,13 +1,18 @@
 import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
+import { generationData } from "./generation.js"
 
 export function updateXP(trait, clickedLevel){
 
 	const currentLevel = getTraitValue(trait)
 	const type = getTraitType(trait)
+    const gen = character.generation
+    const maxTrait = generationData[gen].maxTrait
 
 	if(!type) return
+    
+    if(clickedLevel > maxTrait) return
 
 	// disciplines without names are ignored
 	if(type === "disciplines" && !character.disciplines[trait]?.name){
