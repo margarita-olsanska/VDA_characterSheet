@@ -1,6 +1,4 @@
 import { character } from "./character.js"
-import { costs } from "./costs.js"
-import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
 import { saveCharacter, loadCharacter } from "./storage.js"
 import { renderSheet, renderResources } from "./ui.js"
 import { clans } from "./clans.js"
@@ -41,13 +39,11 @@ genSelect.addEventListener("change", () => {
 
 	const data = generationData[gen]
 
-	// обновляем кровь
 	character.blood.max = data.bloodPool
 
-	if(character.blood.current > data.bloodPool){
+	if(character.blood.current > data.bloodPool)
 		character.blood.current = data.bloodPool
-	}
-
+	
 	updateUI()
 	saveCharacter()
 })
@@ -146,6 +142,37 @@ function handleXP(trait, level){
 	}
 }
 
+document.querySelectorAll(".willpowerCurrent input").forEach((cb, index) => {
+
+	cb.addEventListener("click", () => {
+
+		const newValue = index + 1
+
+		if(cb.checked)
+			character.willpower.current = newValue
+		else
+			character.willpower.current = index
+
+		saveCharacter()
+		updateUI()
+	})
+})
+
+//blood
+document.querySelectorAll(".bloodPoints input").forEach((cb, index) => {
+
+	cb.addEventListener("click", () => {
+
+		if(cb.checked)
+			character.blood.current = index + 1
+		else
+			character.blood.current = index
+		
+
+		saveCharacter()
+		updateUI()
+	})
+})
 
 document.querySelectorAll(".dots").forEach(group => {
 

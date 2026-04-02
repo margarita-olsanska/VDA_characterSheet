@@ -16,6 +16,8 @@ export function loadCharacter() {
     Object.assign(character.disciplines, data.disciplines || {})
     Object.assign(character.backgrounds, data.backgrounds || {})
     Object.assign(character.virtues, data.virtues || {})
+    Object.assign(character.road, data.road || {})
+    Object.assign(character.willpower, data.willpower || {})
 
     character.clan = data.clan || null
     character.xp = data.xp || 0

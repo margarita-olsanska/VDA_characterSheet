@@ -2,8 +2,9 @@ import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { freebieCosts } from "./freebieCosts.js"
 import { getTraitValue, getTraitType } from "./traits.js"
-import { getState, STATES, currentState } from "./state.js"
+import { getState, STATES } from "./state.js"
 import { generationData } from "./generation.js"
+
 
 document.body.dataset.state = getState()
 
@@ -26,10 +27,7 @@ export function renderDots(group, value){
 
 	dots.forEach((dot, i) => {
 
-		// скрыть лишние
 		dot.style.display = i < maxDots ? "" : "none"
-
-		// заполнение
 		dot.classList.toggle("filled", i < value)
 	})
 }
@@ -131,17 +129,23 @@ export function renderBloodInfo(){
 
 export function renderSheet(){
 
-	clanSelect.value = character.clan || ""
+	document.body.dataset.state = getState()
 
-	// sync disciplines
+	const clanSelect = document.getElementById("clanSelect")
+	if(clanSelect){
+		clanSelect.value = character.clan || ""
+	}
+
+	
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
 		const slot = select.dataset.slot
+
 		if(!character.disciplines[slot]) return
+
 		select.value = character.disciplines[slot].name || ""
 	})
 
-	//dots
 	document.querySelectorAll(".dots").forEach(group => {
 
 		const trait = group.dataset.trait
@@ -150,44 +154,11 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-	document.querySelectorAll(".willpowerCurrent input").forEach((cb, index) => {
-
-	cb.addEventListener("click", () => {
-
-		const newValue = index + 1
-
-		if(cb.checked){
-			character.willpower.current = newValue
-		}else{
-			character.willpower.current = index
-		}
-
-		saveCharacter()
-		updateUI()
-	})
-})
-
-	//blood
-	document.querySelectorAll(".bloodPoints input").forEach((cb, index) => {
-
-		cb.addEventListener("click", () => {
-
-			if(cb.checked){
-				character.blood.current = index + 1
-			}else{
-				character.blood.current = index
-			}
-
-			saveCharacter()
-			updateUI()
-		})
-	})
 
 	renderCosts()
 	renderWillpower()
 	renderBlood()
 	renderBloodInfo()
-
 }
 
 export function renderResources(xpInput, freebieInput){
