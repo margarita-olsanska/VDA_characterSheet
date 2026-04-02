@@ -7,6 +7,7 @@ import { clans } from "./clans.js"
 import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
 import { getState, setState, STATES, currentState } from "./state.js"
+import { updateXP } from "./editLogic.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
@@ -98,82 +99,44 @@ document.querySelectorAll(".disciplineSelect").forEach(select => {
 	})
 })
 
+function handleXP(trait, level){
+
+	switch(getState()){
+
+		case STATES.EDIT:
+			return updateXP(trait, level)
+
+		// case STATES.FREEBIE:
+		// 	return freebieXP(trait, level)
+
+		// case STATES.CREATE:
+		// 	return createXP(trait, level)
+
+		default:
+			return // ничего не делаем
+	}
+}
+
+
 document.querySelectorAll(".dots").forEach(group => {
 
 	const trait = group.dataset.trait
 	const dots = group.querySelectorAll(".dot")
 
 	dots.forEach((dot,index) => {
-		dot.addEventListener("click",()=>{
-			if(getState() !== STATES.EDIT){
-				return
-			}
-            console.log("CLICK:", trait, character.disciplines[trait])
+
+		dot.addEventListener("click", () => {
+
 			const clickedLevel = index + 1
-			const currentLevel = getTraitValue(trait)
-			const type = getTraitType(trait)
-            
-            if(type === "disciplines" && !character.disciplines[trait].name){
-                return
-            }
 
-			// dots increment
-			if(clickedLevel < currentLevel) {
+			handleXP(trait, clickedLevel)
 
-				let refund = 0
-
-				for(let lvl = currentLevel - 1; lvl >= clickedLevel; lvl--){
-					refund += costs[type](lvl, trait)
-				}
-
-				setTraitValue(trait, clickedLevel)
-				character.xp += refund
-
-				updateUI()
-				saveCharacter()
-				return
-			}
-
-			// dots decrement 
-			if(clickedLevel > currentLevel) {
-
-				let totalCost = 0
-
-				for(let lvl = currentLevel; lvl < clickedLevel; lvl++){
-					totalCost += costs[type](lvl, trait)
-				}
-
-				if(character.xp >= totalCost){
-
-					character.xp -= totalCost
-					setTraitValue(trait, clickedLevel)
-
-					updateUI()
-					saveCharacter()
-
-				}else{
-					alert("Недостаточно опыта")
-				}
-
-				return
-			}
-
-			// clicking on dot -> uncheck
-			if(clickedLevel === currentLevel) {
-
-				const refundLevel = currentLevel - 1
-				const refund = costs[type](refundLevel, trait)
-
-				setTraitValue(trait, refundLevel)
-				character.xp += refund
-
-				updateUI()
-				saveCharacter()
-			}
-
+			updateUI()
+			saveCharacter()
 		})
 	})
 })
+
 
 loadCharacter()
 updateUI()
