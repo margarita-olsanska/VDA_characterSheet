@@ -4,7 +4,7 @@ import { renderSheet, renderResources } from "./ui.js"
 import { clans } from "./clans.js"
 import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
-import { getState, setState, STATES, currentState } from "./state.js"
+import { getState, setState, STATES } from "./state.js"
 import { updateXP } from "./editLogic.js"
 import { updateFreebie } from "./freebieLogic.js"
 import { generationData } from "./generation.js"
@@ -21,13 +21,15 @@ const editBtn = document.getElementById("editModeBtn")
 const viewBtn = document.getElementById("viewModeBtn")
 
 function updateUI(){
+		console.log("UPDATE UI CALLED")
 	renderSheet()
 	renderResources(xpInput, freebieInput)
 }
 
 createBtn.addEventListener("click", () => {
-	console.log("CURRENT STATE:", getState())
+	console.log("CLICK CREATE BUTTON")
 	setState(STATES.CREATE)
+	console.log("STATE AFTER SET:", getState())
 	updateUI()
 })
 freebieBtn.addEventListener("click", () => {

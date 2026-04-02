@@ -6,6 +6,21 @@ justify-content:center;
 padding:30px;
 }
 
+.checklist {
+	border: 1px solid #555;
+	padding: 10px;
+	margin-bottom: 15px;
+	font-size: 14px;
+}
+
+.checklist .ok {
+	color: #4caf50;
+}
+
+.checklist .fail {
+	color: #f44336;
+}
+
 .sheet{
 
 width:900px;

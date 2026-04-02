@@ -145,12 +145,19 @@ export function updateCreate(trait, clickedLevel){
 	const current = getTraitValue(trait)
 	const type = getTraitType(trait)
 
-	// cannot be changed
+
 	if(type === "road" || type === "willpower"){
 		return
 	}
 
-	if(clickedLevel > current){
+	let targetLevel = clickedLevel
+
+	if(clickedLevel === current){
+		targetLevel = current - 1
+	}
+
+
+	if(targetLevel > current){
 
 		let allowed = true
 
@@ -161,7 +168,7 @@ export function updateCreate(trait, clickedLevel){
 				break
 
 			case "abilities":
-				allowed = canIncreaseAbility(trait, clickedLevel)
+				allowed = canIncreaseAbility(trait, targetLevel)
 				break
 
 			case "disciplines":
@@ -179,11 +186,11 @@ export function updateCreate(trait, clickedLevel){
 
 		if(!allowed) return
 
-		setTraitValue(trait, clickedLevel)
+		setTraitValue(trait, targetLevel)
 	}
 
-	if(clickedLevel < current){
-		setTraitValue(trait, clickedLevel)
+	if(targetLevel < current){
+		setTraitValue(trait, targetLevel)
 	}
 
 	updateDerivedStats()
