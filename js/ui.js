@@ -2,7 +2,7 @@ import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, getTraitType } from "./traits.js"
 import { creationState } from "./creation.js"
-
+import { AppState } from "./state.js"
 export function renderDots(group, value){
 	const dots = group.querySelectorAll(".dot")
 
@@ -12,6 +12,8 @@ export function renderDots(group, value){
 }
 
 export function renderCosts(){
+
+
 	document.querySelectorAll(".dots").forEach(group => {
 
 		const trait = group.dataset.trait
@@ -22,7 +24,10 @@ export function renderCosts(){
 
 		dots.forEach((dot,i) => {
 
-
+			if(character.state !== AppState.EDIT){
+				dot.textContent = ""
+				return
+			}
 			if(type === "disciplines"){
 				const discipline = character.disciplines[trait]?.name
 

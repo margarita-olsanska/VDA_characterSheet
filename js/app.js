@@ -4,8 +4,9 @@ import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
 import { saveCharacter, loadCharacter } from "./storage.js"
 import { renderSheet, renderResources, renderCreation  } from "./ui.js"
 import { clans } from "./clans.js"
-import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
+import {  applyUpgrade, fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
+import { AppState } from "./state.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
@@ -26,6 +27,26 @@ freebieInput.addEventListener("input", () => {
 	character.freebie = parseInt(freebieInput.value) || 0
 	saveCharacter()
 })
+
+document.getElementById("btnCreation").onclick = () => {
+	character.state = AppState.CREATION
+	updateUI()
+}
+
+document.getElementById("btnFreebie").onclick = () => {
+	character.state = AppState.FREEBIE
+	updateUI()
+}
+
+document.getElementById("btnEdir").onclick = () => {
+	character.state = AppState.EDIT
+	updateUI()
+}
+
+document.getElementById("btnView").onclick = () => {
+	character.state = AppState.VIEW
+	updateUI()
+}
 
 clanSelect.addEventListener("change", () => {
 
@@ -97,71 +118,22 @@ document.querySelectorAll(".dots").forEach(group => {
 	const dots = group.querySelectorAll(".dot")
 
 	dots.forEach((dot,index) => {
-		dot.addEventListener("click",()=>{
+		dot.addEventListener("click", () => {
 
-            console.log("CLICK:", trait, character.disciplines[trait])
+			if(character.state === AppState.VIEW)
+				return
+
 			const clickedLevel = index + 1
-			const currentLevel = getTraitValue(trait)
-			const type = getTraitType(trait)
-            
-            if(type === "disciplines" && !character.disciplines[trait].name){
-                return
-            }
 
-			// dots increment
-			if(clickedLevel < currentLevel) {
+			const result = applyUpgrade(trait, clickedLevel)
 
-				let refund = 0
-
-				for(let lvl = currentLevel - 1; lvl >= clickedLevel; lvl--){
-					refund += costs[type](lvl, trait)
-				}
-
-				setTraitValue(trait, clickedLevel)
-				character.xp += refund
-
-				updateUI()
-				saveCharacter()
+			if(!result.success){
+				alert("Недостаточно очков")
 				return
 			}
 
-			// dots decrement 
-			if(clickedLevel > currentLevel) {
-
-				let totalCost = 0
-
-				for(let lvl = currentLevel; lvl < clickedLevel; lvl++){
-					totalCost += costs[type](lvl, trait)
-				}
-
-				if(character.xp >= totalCost){
-
-					character.xp -= totalCost
-					setTraitValue(trait, clickedLevel)
-
-					updateUI()
-					saveCharacter()
-
-				}else{
-					alert("Недостаточно опыта")
-				}
-
-				return
-			}
-
-			// clicking on dot -> uncheck
-			if(clickedLevel === currentLevel) {
-
-				const refundLevel = currentLevel - 1
-				const refund = costs[type](refundLevel, trait)
-
-				setTraitValue(trait, refundLevel)
-				character.xp += refund
-
-				updateUI()
-				saveCharacter()
-			}
-
+			updateUI()
+			saveCharacter()
 		})
 	})
 })
