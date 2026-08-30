@@ -1,35 +1,40 @@
 import { character } from "./character.js"
-import { saveCharacter, loadCharacter } from "./storage.js"
-import { renderSheet, renderResources } from "./ui.js"
+import { saveCharacter, loadCharacter, exportCharacterToFile, exportCharacterToHtml, importCharacterFromFile } from "./storage.js"
+import { renderSheet, renderResources, renderCreation } from "./ui.js"
 import { clans } from "./clans.js"
 import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
-import { getState, setState, STATES, currentState } from "./state.js"
+import { getState, setState, STATES } from "./state.js"
 import { updateXP } from "./editLogic.js"
 import { updateFreebie } from "./freebieLogic.js"
+import { createXP } from "./creationLogic.js"
 import { generationData } from "./generation.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
-const editBtn = document.getElementById("editModeBtn")
-const freebieBtn = document.getElementById("freebieModeBtn")
+const nameInput = document.getElementById("characterName")
 const genSelect = document.getElementById("generationSelect")
 
 function updateUI(){
 	renderSheet()
 	renderResources(xpInput, freebieInput)
+	renderCreation()
 }
 
-editBtn.addEventListener("click", () => {
-	console.log("CURRENT STATE:", getState())
-	setState(STATES.EDIT)
-	updateUI()
+xpInput.addEventListener("input", () => {
+	character.xp = parseInt(xpInput.value) || 0
+	saveCharacter()
 })
 
-freebieBtn.addEventListener("click", () => {
-	setState(STATES.FREEBIE)
-	updateUI()
+freebieInput.addEventListener("input", () => {
+	character.freebie = parseInt(freebieInput.value) || 0
+	saveCharacter()
+})
+
+nameInput.addEventListener("input", () => {
+	character.name = nameInput.value
+	saveCharacter()
 })
 
 genSelect.addEventListener("change", () => {
@@ -43,21 +48,54 @@ genSelect.addEventListener("change", () => {
 
 	if(character.blood.current > data.bloodPool)
 		character.blood.current = data.bloodPool
-	
+
 	updateUI()
 	saveCharacter()
 })
 
+document.getElementById("btnCreation").onclick = () => {
+	setState(STATES.CREATE)
+	updateUI()
+}
 
+document.getElementById("btnFreebie").onclick = () => {
+	setState(STATES.FREEBIE)
+	updateUI()
+}
 
-xpInput.addEventListener("input", () => {
-	character.xp = parseInt(xpInput.value) || 0
-	saveCharacter()
-})
+document.getElementById("btnEdit").onclick = () => {
+	setState(STATES.EDIT)
+	updateUI()
+}
 
-freebieInput.addEventListener("input", () => {
-	character.freebie = parseInt(freebieInput.value) || 0
-	saveCharacter()
+document.getElementById("btnView").onclick = () => {
+	setState(STATES.VIEW)
+	updateUI()
+}
+
+document.getElementById("btnSaveJson").onclick = () => {
+	exportCharacterToFile()
+}
+
+document.getElementById("btnSaveHtml").onclick = () => {
+	exportCharacterToHtml()
+}
+
+document.getElementById("btnLoadJson").onclick = () => {
+	document.getElementById("loadFileInput").click()
+}
+
+document.getElementById("loadFileInput").addEventListener("change", (e) => {
+
+	const file = e.target.files[0]
+	if(!file) return
+
+	importCharacterFromFile(file, () => {
+		updateUI()
+		saveCharacter()
+	})
+
+	e.target.value = ""
 })
 
 clanSelect.addEventListener("change", () => {
@@ -76,7 +114,6 @@ clanSelect.addEventListener("change", () => {
 	updateUI()
 	saveCharacter()
 })
-
 
 //empty
 const empty = document.createElement("option")
@@ -134,8 +171,8 @@ function handleXP(trait, level){
 		case STATES.FREEBIE:
 			return updateFreebie(trait, level)
 
-		// case STATES.CREATE:
-		// 	return createXP(trait, level)
+		case STATES.CREATE:
+			return createXP(trait, level)
 
 		default:
 			return // ничего не делаем
@@ -167,7 +204,6 @@ document.querySelectorAll(".bloodPoints input").forEach((cb, index) => {
 			character.blood.current = index + 1
 		else
 			character.blood.current = index
-		
 
 		saveCharacter()
 		updateUI()
@@ -192,9 +228,6 @@ document.querySelectorAll(".dots").forEach(group => {
 		})
 	})
 })
-
-
-
 
 loadCharacter()
 updateUI()

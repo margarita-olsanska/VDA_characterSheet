@@ -1,5 +1,6 @@
 export const character = {
 
+	name: "",
 	clan: null,
 
 	attributes: {
@@ -97,4 +98,10 @@ export const character = {
 
 	xp: 0,
 	freebie: 0,
+
+	creation: {
+		active: true,
+		stage: "attributes",
+	}
 }
+

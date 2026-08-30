@@ -35,6 +35,10 @@ export function getTraitValue(trait) {
 	return character[type][trait] ?? 0
 }
 
+export function getTraitMin(type) {
+	return (type === "attributes" || type === "virtues") ? 1 : 0
+}
+
 export function setTraitValue(trait, value) {
 
 	const type = getTraitType(trait)

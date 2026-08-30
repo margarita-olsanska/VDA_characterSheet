@@ -1,7 +1,6 @@
 import { character } from "./character.js"
 import { freebieCosts } from "./freebieCosts.js"
-import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
-import { clans } from "./clans.js"
+import { getTraitValue, setTraitValue, getTraitType, getTraitMin } from "./traits.js"
 
 export function updateFreebie(trait, clickedLevel){
 
@@ -15,7 +14,10 @@ export function updateFreebie(trait, clickedLevel){
 		return
 	}
 
-    // dots increment
+	// clicking the currently topmost filled dot removes it
+	if(clickedLevel === currentLevel) clickedLevel = Math.max(currentLevel - 1, getTraitMin(type))
+
+	// dots increment
 	if(clickedLevel > currentLevel){
 
 		let totalCost = 0
@@ -43,18 +45,7 @@ export function updateFreebie(trait, clickedLevel){
 			refund += freebieCosts[type](lvl, trait)
 		}
 
-        setTraitValue(trait, clickedLevel)
+		setTraitValue(trait, clickedLevel)
 		character.freebie += refund
-		return
-	}
-
-    // clicking on dot -> uncheck
-	if(clickedLevel === currentLevel){
-
-		const refundLevel = currentLevel - 1
-		const refund = freebieCosts[type](refundLevel, trait)
-
-		setTraitValue(trait, refundLevel)
-        character.freebie += refund
 	}
 }

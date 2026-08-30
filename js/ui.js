@@ -4,9 +4,7 @@ import { freebieCosts } from "./freebieCosts.js"
 import { getTraitValue, getTraitType } from "./traits.js"
 import { getState, STATES } from "./state.js"
 import { generationData } from "./generation.js"
-
-
-document.body.dataset.state = getState()
+import { creationState } from "./creation.js"
 
 function getMaxDots(type){
 
@@ -23,7 +21,7 @@ export function renderDots(group, value){
 	const dots = group.querySelectorAll(".dot")
 	const trait = group.dataset.trait
 	const type = getTraitType(trait)
-	const maxDots = getMaxDots(type)	
+	const maxDots = getMaxDots(type)
 
 	dots.forEach((dot, i) => {
 
@@ -34,9 +32,7 @@ export function renderDots(group, value){
 
 function getCostFunction(type){
 
-	const state = getState()
-
-	switch(state){
+	switch(getState()){
 
 		case STATES.EDIT:
 			return (lvl, trait) => costs[type](lvl, trait)
@@ -45,22 +41,47 @@ function getCostFunction(type){
 			return (lvl, trait) => freebieCosts[type](lvl, trait)
 
 		default:
-			return () => 0
+			return null
 	}
 }
 
 export function renderCosts(){
+
 	document.querySelectorAll(".dots").forEach(group => {
 
-	const trait = group.dataset.trait
-	const type = getTraitType(trait)
+		const trait = group.dataset.trait
+		const type = getTraitType(trait)
 
-	if(!type) return
-
-		const costFunc = getCostFunction(type)
+		if(!type) return
 
 		const dots = group.querySelectorAll(".dot")
 		const current = getTraitValue(trait)
+
+		if(type === "disciplines"){
+
+			const discipline = character.disciplines[trait]?.name
+
+			if(!discipline){
+				group.style.opacity = 0.3
+				dots.forEach(dot => {
+					dot.textContent = ""
+					dot.classList.remove("cost", "filled")
+				})
+				return
+			}
+
+			group.style.opacity = 1
+		}
+
+		const costFunc = getCostFunction(type)
+
+		if(!costFunc){
+			dots.forEach(dot => {
+				dot.textContent = ""
+				dot.classList.remove("cost")
+			})
+			return
+		}
 
 		dots.forEach((dot,i) => {
 
@@ -96,10 +117,7 @@ export function renderWillpower(){
 
 	checkboxes.forEach((cb, i) => {
 
-		// show only max boxes
 		cb.style.display = i < character.willpower.level ? "" : "none"
-
-		// check all
 		cb.checked = i < character.willpower.current
 	})
 }
@@ -131,18 +149,13 @@ export function renderSheet(){
 
 	document.body.dataset.state = getState()
 
-	const clanSelect = document.getElementById("clanSelect")
-	if(clanSelect){
-		clanSelect.value = character.clan || ""
-	}
+	document.getElementById("characterName").value = character.name || ""
+	document.getElementById("clanSelect").value = character.clan || ""
 
-	
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
 		const slot = select.dataset.slot
-
 		if(!character.disciplines[slot]) return
-
 		select.value = character.disciplines[slot].name || ""
 	})
 
@@ -154,14 +167,100 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-
 	renderCosts()
 	renderWillpower()
 	renderBlood()
 	renderBloodInfo()
+
+	//bookmarks
+	document.querySelectorAll(".bookmark").forEach(btn => btn.classList.remove("active"))
+
+	const activeBtn = {
+		[STATES.CREATE]: "btnCreation",
+		[STATES.FREEBIE]: "btnFreebie",
+		[STATES.EDIT]: "btnEdit",
+		[STATES.VIEW]: "btnView"
+	}[getState()]
+
+	if(activeBtn) document.getElementById(activeBtn).classList.add("active")
 }
 
 export function renderResources(xpInput, freebieInput){
 	xpInput.value = character.xp
 	freebieInput.value = character.freebie
+}
+
+function isValidPriorityDistribution(pool){
+
+	const values = Object.values(pool.assigned).sort((a,b) => a - b)
+	const targets = [pool.tertiary, pool.secondary, pool.primary].sort((a,b) => a - b)
+
+	return values.every((v, i) => v === targets[i])
+}
+
+export function renderCreation(){
+
+	const el = document.getElementById("creationInfo")
+
+	if(!el) return
+
+	if(getState() !== STATES.CREATE){
+		el.innerHTML = ""
+		return
+	}
+
+	const attr = creationState.attributes
+	const abil = creationState.abilities
+
+	const priorityTargets = pool => [pool.tertiary, pool.secondary, pool.primary].sort((a,b) => a - b).join("/")
+
+	const rows = [
+		{
+			label: "Атрибуты",
+			current: `${attr.assigned.physical}/${attr.assigned.social}/${attr.assigned.mental}`,
+			expected: priorityTargets(attr),
+			done: isValidPriorityDistribution(attr)
+		},
+		{
+			label: "Способности",
+			current: `${abil.assigned.talents}/${abil.assigned.skills}/${abil.assigned.knowledges}`,
+			expected: priorityTargets(abil),
+			done: isValidPriorityDistribution(abil)
+		},
+		{
+			label: "Дисциплины",
+			current: `${creationState.disciplines.used}`,
+			expected: `${creationState.disciplines.points}`,
+			done: creationState.disciplines.used === creationState.disciplines.points
+		},
+		{
+			label: "Биография",
+			current: `${creationState.backgrounds.used}`,
+			expected: `${creationState.backgrounds.points}`,
+			done: creationState.backgrounds.used === creationState.backgrounds.points
+		},
+		{
+			label: "Добродетели",
+			current: `${creationState.virtues.used}`,
+			expected: `${creationState.virtues.points}`,
+			done: creationState.virtues.used === creationState.virtues.points
+		}
+	]
+
+	el.innerHTML = `
+		<table class="creationTable">
+			<thead>
+				<tr><th></th><th>Текущее</th><th>Ожидаемое</th></tr>
+			</thead>
+			<tbody>
+				${rows.map(row => `
+					<tr class="${row.done ? "done" : ""}">
+						<td>${row.label}</td>
+						<td>${row.current}</td>
+						<td>${row.expected}</td>
+					</tr>
+				`).join("")}
+			</tbody>
+		</table>
+	`
 }
