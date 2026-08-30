@@ -1,17 +1,20 @@
 import { character } from "./character.js"
-import { costs } from "./costs.js"
-import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
 import { saveCharacter, loadCharacter, exportCharacterToFile, exportCharacterToHtml, importCharacterFromFile } from "./storage.js"
-import { renderSheet, renderResources, renderCreation  } from "./ui.js"
+import { renderSheet, renderResources, renderCreation } from "./ui.js"
 import { clans } from "./clans.js"
-import {  applyUpgrade, fillClanDisciplines, refundAllDisciplines } from "./logic.js"
+import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
 import { disciplines } from "./disciplines.js"
-import { AppState } from "./state.js"
+import { getState, setState, STATES } from "./state.js"
+import { updateXP } from "./editLogic.js"
+import { updateFreebie } from "./freebieLogic.js"
+import { createXP } from "./creationLogic.js"
+import { generationData } from "./generation.js"
 
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
 const nameInput = document.getElementById("characterName")
+const genSelect = document.getElementById("generationSelect")
 
 function updateUI(){
 	renderSheet()
@@ -34,23 +37,39 @@ nameInput.addEventListener("input", () => {
 	saveCharacter()
 })
 
+genSelect.addEventListener("change", () => {
+
+	const gen = parseInt(genSelect.value)
+	character.generation = gen
+
+	const data = generationData[gen]
+
+	character.blood.max = data.bloodPool
+
+	if(character.blood.current > data.bloodPool)
+		character.blood.current = data.bloodPool
+
+	updateUI()
+	saveCharacter()
+})
+
 document.getElementById("btnCreation").onclick = () => {
-	character.state = AppState.CREATION
+	setState(STATES.CREATE)
 	updateUI()
 }
 
 document.getElementById("btnFreebie").onclick = () => {
-	character.state = AppState.FREEBIE
+	setState(STATES.FREEBIE)
 	updateUI()
 }
 
 document.getElementById("btnEdit").onclick = () => {
-	character.state = AppState.EDIT
+	setState(STATES.EDIT)
 	updateUI()
 }
 
 document.getElementById("btnView").onclick = () => {
-	character.state = AppState.VIEW
+	setState(STATES.VIEW)
 	updateUI()
 }
 
@@ -95,7 +114,6 @@ clanSelect.addEventListener("change", () => {
 	updateUI()
 	saveCharacter()
 })
-
 
 //empty
 const empty = document.createElement("option")
@@ -143,25 +161,67 @@ document.querySelectorAll(".disciplineSelect").forEach(select => {
 	})
 })
 
+function handleXP(trait, level){
+
+	switch(getState()){
+
+		case STATES.EDIT:
+			return updateXP(trait, level)
+
+		case STATES.FREEBIE:
+			return updateFreebie(trait, level)
+
+		case STATES.CREATE:
+			return createXP(trait, level)
+
+		default:
+			return // ничего не делаем
+	}
+}
+
+document.querySelectorAll(".willpowerCurrent input").forEach((cb, index) => {
+
+	cb.addEventListener("click", () => {
+
+		const newValue = index + 1
+
+		if(cb.checked)
+			character.willpower.current = newValue
+		else
+			character.willpower.current = index
+
+		saveCharacter()
+		updateUI()
+	})
+})
+
+//blood
+document.querySelectorAll(".bloodPoints input").forEach((cb, index) => {
+
+	cb.addEventListener("click", () => {
+
+		if(cb.checked)
+			character.blood.current = index + 1
+		else
+			character.blood.current = index
+
+		saveCharacter()
+		updateUI()
+	})
+})
+
 document.querySelectorAll(".dots").forEach(group => {
 
 	const trait = group.dataset.trait
 	const dots = group.querySelectorAll(".dot")
 
 	dots.forEach((dot,index) => {
-		dot.addEventListener("click", () => {
 
-			if(character.state === AppState.VIEW)
-				return
+		dot.addEventListener("click", () => {
 
 			const clickedLevel = index + 1
 
-			const result = applyUpgrade(trait, clickedLevel)
-
-			if(!result.success){
-				alert("Недостаточно очков")
-				return
-			}
+			handleXP(trait, clickedLevel)
 
 			updateUI()
 			saveCharacter()

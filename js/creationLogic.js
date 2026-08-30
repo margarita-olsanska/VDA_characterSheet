@@ -1,3 +1,4 @@
+import { character } from "./character.js"
 import { creationState } from "./creation.js"
 import { getTraitType, setTraitValue, getTraitValue, getTraitMin } from "./traits.js"
 import { attributeCategories, abilityCategories, getCategory } from "./categories.js"
@@ -6,13 +7,20 @@ function getPoolTotal(pool){
 	return pool.points ?? (pool.primary + pool.secondary + pool.tertiary)
 }
 
-export function applyCreationUpgrade(trait, targetLevel){
+export function createXP(trait, clickedLevel){
 
 	const type = getTraitType(trait)
 	const current = getTraitValue(trait)
 
+	if(!type) return
+
+	// disciplines without names are ignored
+	if(type === "disciplines" && !character.disciplines[trait]?.name){
+		return
+	}
+
 	// clicking the currently topmost filled dot removes it
-	if(targetLevel === current) targetLevel = Math.max(current - 1, getTraitMin(type))
+	if(clickedLevel === current) clickedLevel = Math.max(current - 1, getTraitMin(type))
 
 	let pool
 	let category = null
@@ -39,12 +47,13 @@ export function applyCreationUpgrade(trait, targetLevel){
 		pool = creationState.virtues
 	}
 
-	if(!pool) return { success: false }
+	if(!pool) return
 
-	const delta = targetLevel - current
+	const delta = clickedLevel - current
 
 	if(delta > 0 && pool.used + delta > getPoolTotal(pool)){
-		return { success: false }
+		alert("Нет доступных очков")
+		return
 	}
 
 	pool.used += delta
@@ -53,7 +62,5 @@ export function applyCreationUpgrade(trait, targetLevel){
 		pool.assigned[category] += delta
 	}
 
-	setTraitValue(trait, targetLevel)
-
-	return { success: true }
+	setTraitValue(trait, clickedLevel)
 }

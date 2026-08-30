@@ -7,9 +7,13 @@ function applyCharacterData(data){
 	Object.assign(character.disciplines, data.disciplines || {})
 	Object.assign(character.backgrounds, data.backgrounds || {})
 	Object.assign(character.virtues, data.virtues || {})
+	Object.assign(character.road, data.road || {})
+	Object.assign(character.willpower, data.willpower || {})
+	Object.assign(character.blood, data.blood || {})
 
 	character.name = data.name || ""
 	character.clan = data.clan || null
+	character.generation = data.generation || character.generation
 	character.xp = data.xp || 0
 	character.freebie = data.freebie || 0
 }

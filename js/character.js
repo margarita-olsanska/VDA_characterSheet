@@ -1,5 +1,3 @@
-import { AppState } from "./state.js"
-
 export const character = {
 
 	name: "",
@@ -78,11 +76,22 @@ export const character = {
 		virtue3: 1
 	},
 
-	bloodPoints: 0,
-	maxBloodPoints: 1,
+	road: {
+		name: "",
+		level: 1
+	},
 
-	willpowerPoints: 0,
-	maxWillpowerPoints: 1,
+	willpower: {
+		level: 1,
+		current: 1
+	},
+
+	generation: 12,
+
+	blood: {
+		max: 11,
+		current: 10
+	},
 
 	healthPoints: 0,
 	maxHealthPoints: 1,
@@ -93,8 +102,6 @@ export const character = {
 	creation: {
 		active: true,
 		stage: "attributes",
-	},
-
-	state: AppState.CREATION
+	}
 }
 

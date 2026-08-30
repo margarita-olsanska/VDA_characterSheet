@@ -1,78 +1,157 @@
 import { character } from "./character.js"
 import { costs } from "./costs.js"
+import { freebieCosts } from "./freebieCosts.js"
 import { getTraitValue, getTraitType } from "./traits.js"
+import { getState, STATES } from "./state.js"
+import { generationData } from "./generation.js"
 import { creationState } from "./creation.js"
-import { AppState } from "./state.js"
-export function renderDots(group, value){
-	const dots = group.querySelectorAll(".dot")
 
-	dots.forEach((dot,i) => {
+function getMaxDots(type){
+
+	if(type === "willpower" || type === "road"){
+		return 10
+	}
+
+	const gen = character.generation
+	return generationData[gen].maxTrait
+}
+
+export function renderDots(group, value){
+
+	const dots = group.querySelectorAll(".dot")
+	const trait = group.dataset.trait
+	const type = getTraitType(trait)
+	const maxDots = getMaxDots(type)
+
+	dots.forEach((dot, i) => {
+
+		dot.style.display = i < maxDots ? "" : "none"
 		dot.classList.toggle("filled", i < value)
 	})
 }
 
-export function renderCosts(){
+function getCostFunction(type){
 
+	switch(getState()){
+
+		case STATES.EDIT:
+			return (lvl, trait) => costs[type](lvl, trait)
+
+		case STATES.FREEBIE:
+			return (lvl, trait) => freebieCosts[type](lvl, trait)
+
+		default:
+			return null
+	}
+}
+
+export function renderCosts(){
 
 	document.querySelectorAll(".dots").forEach(group => {
 
 		const trait = group.dataset.trait
-		const dots = group.querySelectorAll(".dot")
-
-		const current = getTraitValue(trait)
 		const type = getTraitType(trait)
+
+		if(!type) return
+
+		const dots = group.querySelectorAll(".dot")
+		const current = getTraitValue(trait)
+
+		if(type === "disciplines"){
+
+			const discipline = character.disciplines[trait]?.name
+
+			if(!discipline){
+				group.style.opacity = 0.3
+				dots.forEach(dot => {
+					dot.textContent = ""
+					dot.classList.remove("cost", "filled")
+				})
+				return
+			}
+
+			group.style.opacity = 1
+		}
+
+		const costFunc = getCostFunction(type)
+
+		if(!costFunc){
+			dots.forEach(dot => {
+				dot.textContent = ""
+				dot.classList.remove("cost")
+			})
+			return
+		}
 
 		dots.forEach((dot,i) => {
 
-			if(character.state !== AppState.EDIT){
-				dot.textContent = ""
-				return
-			}
-			if(type === "disciplines"){
-				const discipline = character.disciplines[trait]?.name
-
-				// styling if discipline not selected
-				if(!discipline){
-					group.style.opacity = 0.3
-					// dits without costs
-					group.querySelectorAll(".dot").forEach(dot => {
-						dot.textContent = ""
-						dot.classList.remove("cost", "filled")
-					})
-					return 
-				}
-
-				// if discipline selected - normal styling
-				group.style.opacity = 1
-			}
 			dot.textContent = ""
 			dot.classList.remove("cost")
 
-			if (i >= current) {
+			if(i >= current){
 
 				let totalCost = 0
 
-				for (let lvl = current; lvl < i; lvl++) {
-					totalCost += costs[type](lvl, trait)
+				for(let lvl = current; lvl < i; lvl++){
+					totalCost += costFunc(lvl, trait)
 				}
 
-				totalCost += costs[type](i, trait)
+				totalCost += costFunc(i, trait)
 
 				dot.textContent = totalCost
 				dot.classList.add("cost")
 
-				dot.style.color = character.xp < totalCost ? "red" : "green"
+				const resource = getState() === STATES.FREEBIE
+					? character.freebie
+					: character.xp
+
+				dot.style.color = resource < totalCost ? "red" : "green"
 			}
 		})
 	})
 }
 
+export function renderWillpower(){
+
+	const checkboxes = document.querySelectorAll(".willpowerCurrent input")
+
+	checkboxes.forEach((cb, i) => {
+
+		cb.style.display = i < character.willpower.level ? "" : "none"
+		cb.checked = i < character.willpower.current
+	})
+}
+
+export function renderBlood(){
+
+	const checkboxes = document.querySelectorAll(".bloodPoints input")
+
+	const max = character.blood.max
+	const current = character.blood.current
+
+	checkboxes.forEach((cb, i) => {
+
+		cb.style.display = i < max ? "" : "none"
+		cb.checked = i < current
+	})
+}
+
+export function renderBloodInfo(){
+
+	const info = document.getElementById("bloodInfo")
+	const gen = character.generation
+	const data = generationData[gen]
+
+	info.textContent = `Макс: ${data.bloodPool} | За ход: ${data.perTurn}`
+}
+
 export function renderSheet(){
+
+	document.body.dataset.state = getState()
 
 	document.getElementById("characterName").value = character.name || ""
 	document.getElementById("clanSelect").value = character.clan || ""
 
-	// sync disciplines
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
 		const slot = select.dataset.slot
@@ -80,7 +159,6 @@ export function renderSheet(){
 		select.value = character.disciplines[slot].name || ""
 	})
 
-	//dots
 	document.querySelectorAll(".dots").forEach(group => {
 
 		const trait = group.dataset.trait
@@ -89,18 +167,20 @@ export function renderSheet(){
 		renderDots(group, value)
 	})
 
-	//costs
 	renderCosts()
+	renderWillpower()
+	renderBlood()
+	renderBloodInfo()
 
 	//bookmarks
 	document.querySelectorAll(".bookmark").forEach(btn => btn.classList.remove("active"))
 
 	const activeBtn = {
-		[AppState.CREATION]: "btnCreation",
-		[AppState.FREEBIE]: "btnFreebie",
-		[AppState.EDIT]: "btnEdit",
-		[AppState.VIEW]: "btnView"
-	}[character.state]
+		[STATES.CREATE]: "btnCreation",
+		[STATES.FREEBIE]: "btnFreebie",
+		[STATES.EDIT]: "btnEdit",
+		[STATES.VIEW]: "btnView"
+	}[getState()]
 
 	if(activeBtn) document.getElementById(activeBtn).classList.add("active")
 }
@@ -124,7 +204,7 @@ export function renderCreation(){
 
 	if(!el) return
 
-	if(character.state !== AppState.CREATION){
+	if(getState() !== STATES.CREATE){
 		el.innerHTML = ""
 		return
 	}

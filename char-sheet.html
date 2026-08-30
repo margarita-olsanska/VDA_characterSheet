@@ -64,7 +64,18 @@
 					<select id="clanSelect"></select>
 					
 					<label>Поколение</label>
-					<input type="text">
+					<select id="generationSelect">
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+						<option value="8">8</option>
+						<option value="9">9</option>
+						<option value="10">10</option>
+						<option value="11">11</option>
+						<option value="12" selected>12</option>
+						<option value="13">13</option>
+					</select>
 
 					<label>Сир</label>
 					<input type="text">
@@ -896,6 +907,7 @@
 			<div class="columns">
 				<div>
 					Запас крови
+					<div id="bloodInfo"></div>
 					<div class="bloodPoints">
 						<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
 						<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
@@ -909,19 +921,43 @@
 				</div>
 				<div>
 					Дорога
-					<div class="road">
-						<input type="text">
-						<div class="roadPoints">
-							<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
-							<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
-						</div>
+					<div class="dots" data-trait="road">
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
 					</div>
 					Воля
-					<div class="willpowerPoints">
-						<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
-						<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
+					<div class="dots" data-trait="willpower">
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
+						<span class="dot"></span>
 					</div>
-
+					<div class="willpowerCurrent">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+						<input type="checkbox">
+					</div>
 				</div>
 
 				<div>

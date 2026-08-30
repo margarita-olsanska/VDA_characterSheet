@@ -359,17 +359,21 @@ select{
 	accent-color:var(--blood-dark);
 }
 
-.road, .willpowerPoints{
+#bloodInfo{
+	font-size:13px;
+	font-style:italic;
+	color:var(--blood-dark);
+	margin-top:2px;
+}
+
+.willpowerCurrent{
+	display:flex;
+	flex-wrap:wrap;
+	gap:5px;
 	margin-top:6px;
 }
 
-.roadPoints, .willpowerPoints{
-	display:flex;
-	gap:5px;
-	margin-top:4px;
-}
-
-.roadPoints input, .willpowerPoints input{
+.willpowerCurrent input{
 	width:16px;
 	height:16px;
 	accent-color:var(--blood-dark);
