@@ -1,21 +1,30 @@
 import { creationState } from "./creation.js"
-import { getTraitType, setTraitValue, getTraitValue } from "./traits.js"
+import { getTraitType, setTraitValue, getTraitValue, getTraitMin } from "./traits.js"
+import { attributeCategories, abilityCategories, getCategory } from "./categories.js"
+
+function getPoolTotal(pool){
+	return pool.points ?? (pool.primary + pool.secondary + pool.tertiary)
+}
 
 export function applyCreationUpgrade(trait, targetLevel){
 
 	const type = getTraitType(trait)
 	const current = getTraitValue(trait)
 
-	if(targetLevel <= current) return true
+	// clicking the currently topmost filled dot removes it
+	if(targetLevel === current) targetLevel = Math.max(current - 1, getTraitMin(type))
 
 	let pool
+	let category = null
 
 	if(type === "attributes"){
 		pool = creationState.attributes
+		category = getCategory(attributeCategories, trait)
 	}
 
 	if(type === "abilities"){
 		pool = creationState.abilities
+		category = getCategory(abilityCategories, trait)
 	}
 
 	if(type === "disciplines"){
@@ -30,15 +39,21 @@ export function applyCreationUpgrade(trait, targetLevel){
 		pool = creationState.virtues
 	}
 
-	if(!pool) return false
+	if(!pool) return { success: false }
 
-	if(pool.used >= pool.points){
-		alert("Нет доступных очков")
-		return false
+	const delta = targetLevel - current
+
+	if(delta > 0 && pool.used + delta > getPoolTotal(pool)){
+		return { success: false }
 	}
 
-	pool.used++
+	pool.used += delta
+
+	if(category){
+		pool.assigned[category] += delta
+	}
+
 	setTraitValue(trait, targetLevel)
 
-	return true
+	return { success: true }
 }

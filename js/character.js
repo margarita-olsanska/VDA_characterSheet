@@ -2,6 +2,7 @@ import { AppState } from "./state.js"
 
 export const character = {
 
+	name: "",
 	clan: null,
 
 	attributes: {
@@ -92,6 +93,8 @@ export const character = {
 	creation: {
 		active: true,
 		stage: "attributes",
-	}
+	},
+
+	state: AppState.CREATION
 }
 

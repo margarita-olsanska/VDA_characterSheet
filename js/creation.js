@@ -4,6 +4,7 @@ export const creationState = {
 		primary: 7,
 		secondary: 5,
 		tertiary: 3,
+		used: 0,
 		assigned: {
 			physical: 0,
 			social: 0,
@@ -20,6 +21,7 @@ export const creationState = {
 		primary: 13,
 		secondary: 9,
 		tertiary: 5,
+		used: 0,
 		assigned: {
 			talents: 0,
 			skills: 0,

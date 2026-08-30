@@ -2,7 +2,7 @@ import { character } from "./character.js"
 import { clans } from "./clans.js"
 import { costs } from "./costs.js"
 import { AppState } from "./state.js"
-import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
+import { getTraitValue, setTraitValue, getTraitType, getTraitMin } from "./traits.js"
 import { applyCreationUpgrade } from "./creationLogic.js"
 
 export function fillClanDisciplines(){
@@ -79,6 +79,9 @@ export function applyXPUpgrade(trait, targetLevel){
 		return { success: false }
 	}
 
+	// clicking the currently topmost filled dot removes it
+	if(targetLevel === current) targetLevel = Math.max(current - 1, getTraitMin(type))
+
 	let totalCost = 0
 
 	// 🔼 увеличение
@@ -119,6 +122,9 @@ export function applyFreebieUpgrade(trait, targetLevel){
 	if(type === "disciplines" && !character.disciplines[trait]?.name){
 		return { success: false }
 	}
+
+	// clicking the currently topmost filled dot removes it
+	if(targetLevel === current) targetLevel = Math.max(current - 1, getTraitMin(type))
 
 	let totalCost = 0
 

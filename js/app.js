@@ -1,7 +1,7 @@
 import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, setTraitValue, getTraitType } from "./traits.js"
-import { saveCharacter, loadCharacter } from "./storage.js"
+import { saveCharacter, loadCharacter, exportCharacterToFile, exportCharacterToHtml, importCharacterFromFile } from "./storage.js"
 import { renderSheet, renderResources, renderCreation  } from "./ui.js"
 import { clans } from "./clans.js"
 import {  applyUpgrade, fillClanDisciplines, refundAllDisciplines } from "./logic.js"
@@ -11,6 +11,7 @@ import { AppState } from "./state.js"
 const xpInput = document.getElementById("xpInput")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
+const nameInput = document.getElementById("characterName")
 
 function updateUI(){
 	renderSheet()
@@ -28,6 +29,11 @@ freebieInput.addEventListener("input", () => {
 	saveCharacter()
 })
 
+nameInput.addEventListener("input", () => {
+	character.name = nameInput.value
+	saveCharacter()
+})
+
 document.getElementById("btnCreation").onclick = () => {
 	character.state = AppState.CREATION
 	updateUI()
@@ -38,7 +44,7 @@ document.getElementById("btnFreebie").onclick = () => {
 	updateUI()
 }
 
-document.getElementById("btnEdir").onclick = () => {
+document.getElementById("btnEdit").onclick = () => {
 	character.state = AppState.EDIT
 	updateUI()
 }
@@ -47,6 +53,31 @@ document.getElementById("btnView").onclick = () => {
 	character.state = AppState.VIEW
 	updateUI()
 }
+
+document.getElementById("btnSaveJson").onclick = () => {
+	exportCharacterToFile()
+}
+
+document.getElementById("btnSaveHtml").onclick = () => {
+	exportCharacterToHtml()
+}
+
+document.getElementById("btnLoadJson").onclick = () => {
+	document.getElementById("loadFileInput").click()
+}
+
+document.getElementById("loadFileInput").addEventListener("change", (e) => {
+
+	const file = e.target.files[0]
+	if(!file) return
+
+	importCharacterFromFile(file, () => {
+		updateUI()
+		saveCharacter()
+	})
+
+	e.target.value = ""
+})
 
 clanSelect.addEventListener("change", () => {
 
