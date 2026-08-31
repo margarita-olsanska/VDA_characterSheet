@@ -2,6 +2,8 @@ export const character = {
 
 	name: "",
 	clan: null,
+	nature: null,
+	demeanor: null,
 
 	attributes: {
 		strength: 1,
@@ -55,20 +57,21 @@ export const character = {
 	disciplines: {
 		slot1: { name: null, level: 0 },
 		slot2: { name: null, level: 0 },
-		slot3: { name: null, level: 0 },
-		slot4: { name: null, level: 0 },
-		slot5: { name: null, level: 0 },
-		slot6: { name: null, level: 0 },
+		slot3: { name: null, level: 0 }
 	},
 
+	customAbilities: {},
+
 	backgrounds: {
-		background1: 0,
-		background2: 0,
-		background3: 0,
-		background4: 0,
-		background5: 0,
-		background6: 0,
+		background1: { type: null, level: 0 },
+		background2: { type: null, level: 0 },
+		background3: { type: null, level: 0 },
+		background4: { type: null, level: 0 },
+		background5: { type: null, level: 0 }
 	},
+
+	sireNotes: "",
+	disciplineCards: {},
 
 	virtues: {
 		virtue1: 1,
@@ -77,7 +80,7 @@ export const character = {
 	},
 
 	road: {
-		name: "",
+		type: null,
 		level: 1
 	},
 

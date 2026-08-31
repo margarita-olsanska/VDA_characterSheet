@@ -5,6 +5,7 @@ import { getTraitValue, getTraitType } from "./traits.js"
 import { getState, STATES } from "./state.js"
 import { generationData } from "./generation.js"
 import { creationState } from "./creation.js"
+import { archetypes } from "./archetypes.js"
 
 function getMaxDots(type){
 
@@ -57,11 +58,13 @@ export function renderCosts(){
 		const dots = group.querySelectorAll(".dot")
 		const current = getTraitValue(trait)
 
-		if(type === "disciplines"){
+		if(type === "disciplines" || type === "backgrounds"){
 
-			const discipline = character.disciplines[trait]?.name
+			const picked = type === "disciplines"
+				? character.disciplines[trait]?.name
+				: character.backgrounds[trait]?.type
 
-			if(!discipline){
+			if(!picked){
 				group.style.opacity = 0.3
 				dots.forEach(dot => {
 					dot.textContent = ""
@@ -149,14 +152,37 @@ export function renderSheet(){
 
 	document.body.dataset.state = getState()
 
+	// XP only matters while spending XP (Прокачка), freebie only while spending freebie points
+	document.getElementById("xpLabel").style.display = getState() === STATES.EDIT ? "" : "none"
+	document.getElementById("freebieLabel").style.display = getState() === STATES.FREEBIE ? "" : "none"
+
 	document.getElementById("characterName").value = character.name || ""
 	document.getElementById("clanSelect").value = character.clan || ""
+	document.getElementById("natureSelect").value = character.nature || ""
+	document.getElementById("demeanorSelect").value = character.demeanor || ""
+	document.getElementById("sireNotes").value = character.sireNotes || ""
+	document.getElementById("roadSelect").value = character.road.type || ""
+
+	document.getElementById("natureCardBody").innerHTML = character.nature
+		? `<strong>${archetypes[character.nature].name}</strong><p>${archetypes[character.nature].description}</p>`
+		: "Не выбрана"
+
+	document.getElementById("demeanorCardBody").innerHTML = character.demeanor
+		? `<strong>${archetypes[character.demeanor].name}</strong><p>${archetypes[character.demeanor].description}</p>`
+		: "Не выбрана"
 
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
 		const slot = select.dataset.slot
 		if(!character.disciplines[slot]) return
 		select.value = character.disciplines[slot].name || ""
+	})
+
+	document.querySelectorAll(".backgroundSelect").forEach(select => {
+
+		const slot = select.dataset.slot
+		if(!character.backgrounds[slot]) return
+		select.value = character.backgrounds[slot].type || ""
 	})
 
 	document.querySelectorAll(".dots").forEach(group => {
