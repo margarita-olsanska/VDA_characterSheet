@@ -587,6 +587,12 @@ select{
 	font-style:italic;
 }
 
+/* discipline cards (data-card-id) get regular text, unlike biography cards -
+   their body now holds a description + a bold "Правила:" rules paragraph */
+.cardList .card[data-card-id] .cardBody, .cardOverflowList .card[data-card-id] .cardBody{
+	font-style:normal;
+}
+
 .cardLevelRow{
 	display:flex;
 	align-items:center;

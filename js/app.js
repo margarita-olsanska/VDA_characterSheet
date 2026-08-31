@@ -660,7 +660,22 @@ function createDisciplineCard(id, data){
 
 		const body = document.createElement("div")
 		body.className = "cardBody"
-		body.textContent = p.description
+
+		const descPara = document.createElement("p")
+		descPara.textContent = p.description
+		body.appendChild(descPara)
+
+		if(p.rules){
+
+			const rulesPara = document.createElement("p")
+			const rulesLabel = document.createElement("strong")
+			rulesLabel.textContent = "Правила:"
+
+			rulesPara.appendChild(rulesLabel)
+			rulesPara.appendChild(document.createTextNode(" " + p.rules))
+
+			body.appendChild(rulesPara)
+		}
 
 		const deleteBtn = document.createElement("button")
 		deleteBtn.type = "button"
@@ -698,6 +713,10 @@ function createDisciplineCard(id, data){
 	formDescArea.maxLength = 3000
 	formDescArea.placeholder = "Описание силы..."
 
+	const formRulesArea = document.createElement("textarea")
+	formRulesArea.maxLength = 3000
+	formRulesArea.placeholder = "Правила силы..."
+
 	const saveBtn = document.createElement("button")
 	saveBtn.type = "button"
 	saveBtn.className = "addSlotBtn"
@@ -718,7 +737,8 @@ function createDisciplineCard(id, data){
 			discipline: formDisciplineSelect.value,
 			level: formLevel,
 			name,
-			description: formDescArea.value
+			description: formDescArea.value,
+			rules: formRulesArea.value
 		}
 
 		savePowerLibrary()
@@ -731,6 +751,7 @@ function createDisciplineCard(id, data){
 
 		formNameInput.value = ""
 		formDescArea.value = ""
+		formRulesArea.value = ""
 
 		updateUI()
 	})
@@ -739,6 +760,7 @@ function createDisciplineCard(id, data){
 	formBox.appendChild(formLevelRow)
 	formBox.appendChild(formNameInput)
 	formBox.appendChild(formDescArea)
+	formBox.appendChild(formRulesArea)
 	formBox.appendChild(saveBtn)
 
 	powerSelect.addEventListener("change", () => {
