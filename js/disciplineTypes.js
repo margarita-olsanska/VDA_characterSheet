@@ -1,0 +1,22 @@
+export const disciplineTypes = {
+	animalism: { name: "Анимализм" },
+	auspex: { name: "Ясновидение" },
+	celerity: { name: "Стремительность" },
+	chimerstry: { name: "Химерия" },
+	dementation: { name: "Помешательство" },
+	demonion: { name: "Демонион" },
+	domination: { name: "Доминирование" },
+	flight: { name: "Полёт" },
+	fortitude: { name: "Стойкость" },
+	necromancy: { name: "Некромантия" },
+	obfuscate: { name: "Сокрытие" },
+	obtenebration: { name: "Затемнение" },
+	potence: { name: "Мощь" },
+	presence: { name: "Величие" },
+	protean: { name: "Метаморфозы" },
+	quietus: { name: "Упокоение" },
+	serpentis: { name: "Серпентис" },
+	thaumaturgy: { name: "Тауматургия" },
+	valeren: { name: "Валерен" },
+	vicissitude: { name: "Преображение" }
+}

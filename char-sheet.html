@@ -9,27 +9,46 @@
 		<div class="book">
 
 			<nav class="bookmarks">
-				<button id="btnCreation" class="bookmark">Создание</button>
-				<button id="btnFreebie" class="bookmark">Свободные очки</button>
-				<button id="btnEdit" class="bookmark">Прокачка</button>
-				<button id="btnView" class="bookmark">Просмотр</button>
-				<button id="btnSaveJson" class="bookmark action">Сохранить как .json</button>
-				<button id="btnSaveHtml" class="bookmark action">Сохранить как .html</button>
-				<button id="btnLoadJson" class="bookmark action">Загрузить из файла</button>
-				<input type="file" id="loadFileInput" accept="application/json" style="display:none">
+
+				<div class="bookmarkGroup">
+					<button id="btnCreation" class="bookmark">Создание</button>
+					<button id="btnFreebie" class="bookmark">Свободные очки</button>
+				</div>
+
+				<div class="bookmarkGroup">
+					<button id="btnEdit" class="bookmark">Прокачка</button>
+				</div>
+
+				<div class="bookmarkGroup">
+					<button id="btnView" class="bookmark">Просмотр</button>
+					<button id="btnSaveHtml" class="bookmark action">Сохранить лист (.html)</button>
+				</div>
+
+				<div class="bookmarkGroup">
+					<button id="btnSaveJson" class="bookmark action">Экспорт персонажа</button>
+					<button id="btnLoadJson" class="bookmark action">Импорт персонажа</button>
+					<input type="file" id="loadFileInput" accept="application/json" style="display:none">
+				</div>
+
+				<div class="bookmarkGroup">
+					<button id="btnSaveLibrary" class="bookmark action">Экспорт библиотеки</button>
+					<button id="btnLoadLibrary" class="bookmark action">Импорт библиотеки</button>
+					<input type="file" id="loadLibraryInput" accept="application/json" style="display:none">
+				</div>
+
 			</nav>
 
 			<div class="sheet">
 			<h1>VAMPIRE: THE DARK AGES</h1>
 
 			<div class="resources">
-				<label>
-				XP
+				<label id="xpLabel">
+				ОЧКИ ОПЫТА
 				<input type="number" id="xpInput">
 				</label>
 
-				<label>
-				Freebie
+				<label id="freebieLabel">
+				СВОБОДНЫЕ ОЧКИ
 				<input type="number" id="freebieInput">
 				</label>
 
@@ -50,10 +69,10 @@
 
 				<div>
 					<label>Натура</label>
-					<input type="text">
+					<select id="natureSelect"></select>
 
 					<label>Маска</label>
-					<input type="text">
+					<select id="demeanorSelect"></select>
 
 					<label>Амплуа</label>
 					<input type="text">
@@ -90,48 +109,15 @@
 					<h3>Физические</h3>
 					<div class="attribute">
 						Сила
-						<div class="dots" data-trait="strength">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="strength"></div>
 					</div>
 					<div class="attribute">
 						Ловкость
-						<div class="dots" data-trait="dexterity">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="dexterity"></div>
 					</div>
 					<div class="attribute">
 						Выносливость
-						<div class="dots" data-trait="stamina">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="stamina"></div>
 					</div>
 				</div>
 				<div>
@@ -139,96 +125,30 @@
 
 					<div class="attribute">
 						Обаяние
-						<div class="dots" data-trait="charisma">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="charisma"></div>
 					</div>
 					<div class="attribute">
 						Манипуляция
-						<div class="dots" data-trait="manipulation">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="manipulation"></div>
 					</div>
 					<div class="attribute">
 						Привлекательность
-						<div class="dots" data-trait="composure">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="composure"></div>
 					</div>
 				</div>
 				<div>
 					<h3>Ментальные</h3>
 					<div class="attribute">
 						Восприятие
-						<div class="dots" data-trait="wits">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="wits"></div>
 					</div>
 					<div class="attribute">
 						Интеллект
-						<div class="dots" data-trait="intelligence">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="intelligence"></div>
 					</div>
 					<div class="attribute">
 						Смекалка
-						<div class="dots" data-trait="resolve">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="resolve"></div>
 					</div>
 				</div>
 			</div>
@@ -237,464 +157,149 @@
 
 			<h2>Способности</h2>
 			<div class="columns">
-				<div>
+				<div id="talentsColumn" data-category="talents">
 					<h3>Таланты</h3>
 					<div class="ability">
 						Атлетика
-						<div class="dots" data-trait="athletics">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="athletics"></div>
 					</div>
 					<div class="ability">
 						Бдительность
-						<div class="dots" data-trait="alertness">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="alertness"></div>
 					</div>
 					<div class="ability">
 						Драка
-						<div class="dots" data-trait="brawl">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="brawl"></div>
 					</div>
 					<div class="ability">
 						Запугивание
-						<div class="dots" data-trait="intimidation">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="intimidation"></div>
 					</div>
 					<div class="ability">
 						Красноречие
-						<div class="dots" data-trait="expression">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="expression"></div>
 					</div>
 					<div class="ability">
 						Лидерство
-						<div class="dots" data-trait="leadership">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="leadership"></div>
 					</div>
 					<div class="ability">
 						Ловкость рук
-						<div class="dots" data-trait="legerdemain">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="legerdemain"></div>
 					</div>
 					<div class="ability">
 						Хитрость
-						<div class="dots" data-trait="subterfuge">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="subterfuge"></div>
 					</div>
 					<div class="ability">
 						Шестое чувство
-						<div class="dots" data-trait="awareness">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="awareness"></div>
 					</div>
 					<div class="ability">
 						Эмпатия
-						<div class="dots" data-trait="empathy">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="empathy"></div>
+					</div>
+
+					<div class="addAbility" data-category="talents">
+						<input type="text" class="addAbilityInput" placeholder="Новая способность">
+						<button type="button" class="addAbilityBtn">+</button>
 					</div>
 				</div>
-				<div>
+				<div id="skillsColumn" data-category="skills">
 					<h3>Навыки</h3>
 					<div class="ability">
 						Стрельба из лука
-						<div class="dots" data-trait="archery">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="archery"></div>
 					</div>
 					<div class="ability">
 						Коммерция
-						<div class="dots" data-trait="commerce">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="commerce"></div>
 					</div>
 					<div class="ability">
 						Выживание
-						<div class="dots" data-trait="survival">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="survival"></div>
 					</div>
 					<div class="ability">
 						Исполнение
-						<div class="dots" data-trait="performance">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="performance"></div>
 					</div>
 					<div class="ability">
 						Верховая езда
-						<div class="dots" data-trait="ride">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="ride"></div>
 					</div>
 					<div class="ability">
 						Обр. с животными
-						<div class="dots" data-trait="animalKen">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="animalKen"></div>
 					</div>
 					<div class="ability">
 						Ремесло
-						<div class="dots" data-trait="crafts">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="crafts"></div>
 					</div>
 					<div class="ability">
 						Скрытность
-						<div class="dots" data-trait="stealth">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="stealth"></div>
 					</div>
 					<div class="ability">
 						Фехтование
-						<div class="dots" data-trait="melee">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="melee"></div>
 					</div>
 					<div class="ability">
 						Этикет
-						<div class="dots" data-trait="etiquette">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="etiquette"></div>
+					</div>
+
+					<div class="addAbility" data-category="skills">
+						<input type="text" class="addAbilityInput" placeholder="Новая способность">
+						<button type="button" class="addAbilityBtn">+</button>
 					</div>
 				</div>
-				
-				<div>
+
+				<div id="knowledgesColumn" data-category="knowledges">
 					<h3>Знания</h3>
 					<div class="ability">
 						Гум. науки
-						<div class="dots" data-trait="academics">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="academics"></div>
 					</div>
 					<div class="ability">
 						Законы
-						<div class="dots" data-trait="law">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="law"></div>
 					</div>
 					<div class="ability">
 						Медицина
-						<div class="dots" data-trait="medicine">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="medicine"></div>
 					</div>
 					<div class="ability">
 						Оккультизм
-						<div class="dots" data-trait="occult">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="occult"></div>
 					</div>
 					<div class="ability">
 						Политика
-						<div class="dots" data-trait="politics">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="politics"></div>
 					</div>
 					<div class="ability">
 						Расследование
-						<div class="dots" data-trait="investigation">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="investigation"></div>
 					</div>
 					<div class="ability">
 						Головоломки
-						<div class="dots" data-trait="enigmas">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="enigmas"></div>
 					</div>
 					<div class="ability">
 						Житейская мудрость
-						<div class="dots" data-trait="hearthWisdom">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="hearthWisdom"></div>
 					</div>
 					<div class="ability">
 						Распорядительство
-						<div class="dots" data-trait="seneschal">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="seneschal"></div>
 					</div>
 					<div class="ability">
 						Теология
-						<div class="dots" data-trait="theology">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="theology"></div>
+					</div>
+
+					<div class="addAbility" data-category="knowledges">
+						<input type="text" class="addAbilityInput" placeholder="Новая способность">
+						<button type="button" class="addAbilityBtn">+</button>
 					</div>
 				</div>
 			</div>
@@ -703,210 +308,72 @@
 
 			<h2>Преимущества</h2>
 			<div class="columns">
-				<div>
+				<div id="disciplinesColumn">
 					<h3>Дисциплины</h3>
 
 					<div class="discipline">
 						<select data-slot="slot1" class="disciplineSelect"></select>
-						<div class="dots" data-trait="slot1">
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="slot1"></div>
 					</div>
 
 					<div class="discipline">
 						<select data-slot="slot2" class="disciplineSelect"></select>
-						<div class="dots" data-trait="slot2">
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="slot2"></div>
 					</div>
 
 					<div class="discipline">
 						<select data-slot="slot3" class="disciplineSelect"></select>
-						<div class="dots" data-trait="slot3">
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-						</div>
+						<div class="dots" data-trait="slot3"></div>
 					</div>
 
-					<div class="discipline">
-						<select data-slot="slot4" class="disciplineSelect"></select>
-						<div class="dots" data-trait="slot4">
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-						</div>
-					</div>
-
-					<div class="discipline">
-						<select data-slot="slot5" class="disciplineSelect"></select>
-						<div class="dots" data-trait="slot5">
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-						</div>
-					</div>
-
-					<div class="discipline">
-						<select data-slot="slot6" class="disciplineSelect"></select>
-						<div class="dots" data-trait="slot6">
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-								<span class="dot"></span>
-						</div>
-					</div>
+					<button type="button" id="addDisciplineBtn" class="addSlotBtn">+ Добавить дисциплину</button>
 				</div>
-				<div>
+				<div id="backgroundsColumn">
 					<h3>Факты Биографии</h3>
 
 					<div class="background">
-						<input type="text">
-						<div class="dots" data-trait="background1">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<select class="backgroundSelect" data-slot="background1"></select>
+						<div class="dots" data-trait="background1"></div>
 					</div>
 					<div class="background">
-						<input type="text">
-						<div class="dots" data-trait="background2">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<select class="backgroundSelect" data-slot="background2"></select>
+						<div class="dots" data-trait="background2"></div>
 					</div>
 					<div class="background">
-						<input type="text">
-						<div class="dots" data-trait="background3">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<select class="backgroundSelect" data-slot="background3"></select>
+						<div class="dots" data-trait="background3"></div>
 					</div>
 					<div class="background">
-						<input type="text">
-						<div class="dots" data-trait="background4">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<select class="backgroundSelect" data-slot="background4"></select>
+						<div class="dots" data-trait="background4"></div>
 					</div>
 					<div class="background">
-						<input type="text">
-						<div class="dots" data-trait="background5">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
+						<select class="backgroundSelect" data-slot="background5"></select>
+						<div class="dots" data-trait="background5"></div>
 					</div>
-					<div class="background">
-						<input type="text">
-						<div class="dots" data-trait="background6">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-						</div>
-					</div>
+
+					<button type="button" id="addBackgroundBtn" class="addSlotBtn">+ Добавить факт биографии</button>
 				</div>
 
 				<div>
 					<h3>Добродетели</h3>
 					<div class="virtue">
 						Совесть/Решимость
-						<div class="dots" data-trait="virtue1">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-
-						</div>
+						<div class="dots" data-trait="virtue1"></div>
 					</div>
 					<div class="virtue">
 						Самоконтроль/Инстинкт
-						<div class="dots" data-trait="virtue2">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-
-						</div>
+						<div class="dots" data-trait="virtue2"></div>
 					</div>
 					<div class="virtue">
 						Смелость
-						<div class="dots" data-trait="virtue3">
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-							<span class="dot"></span>
-
-						</div>
+						<div class="dots" data-trait="virtue3"></div>
 					</div>
 				</div>
 			</div>
 			<div class="columns">
 				<div>
-					Запас крови
+					<h3>Запас крови</h3>
 					<div id="bloodInfo"></div>
 					<div class="bloodPoints">
 						<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
@@ -920,32 +387,11 @@
 					</div>
 				</div>
 				<div>
-					Дорога
-					<div class="dots" data-trait="road">
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-					</div>
-					Воля
-					<div class="dots" data-trait="willpower">
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-						<span class="dot"></span>
-					</div>
+					<h3>Дорога</h3>
+					<select id="roadSelect"></select>
+					<div class="dots" data-trait="road"></div>
+					<h3>Воля</h3>
+					<div class="dots" data-trait="willpower"></div>
 					<div class="willpowerCurrent">
 						<input type="checkbox">
 						<input type="checkbox">
@@ -961,7 +407,7 @@
 				</div>
 
 				<div>
-					Здоровье
+					<h3>Здоровье</h3>
 					<div class="healthPoints">
 						<label>Задет <input type="checkbox"></label>
 						<label>Поврежден <input type="checkbox"></label>
@@ -975,7 +421,62 @@
 			</div>
 			</div>
 
+			<aside class="cardPanel">
+
+				<div class="card">
+					<h4>Натура</h4>
+					<div class="cardBody" id="natureCardBody">Не выбрана</div>
+				</div>
+
+				<div class="card">
+					<h4>Маска</h4>
+					<div class="cardBody" id="demeanorCardBody">Не выбрана</div>
+				</div>
+
+				<div class="card">
+					<h4>Сир</h4>
+					<textarea id="sireNotes" maxlength="500" placeholder="Что известно о сире персонажа..."></textarea>
+				</div>
+
+				<div class="cardSection">
+					<h3>Дисциплины</h3>
+					<div class="cardList" id="disciplineCardList"></div>
+					<button type="button" id="addDisciplineCardBtn" class="addSlotBtn">+ Добавить карточку дисциплины</button>
+				</div>
+
+				<div class="cardSection" id="biographySidebarSection">
+					<h3>Факты биографии</h3>
+					<div class="cardList" id="biographyCardList"></div>
+				</div>
+
+			</aside>
+
 		</div>
+
+		<div class="cardOverflow" id="cardOverflow">
+
+			<div class="cardSection" id="disciplineOverflowSection">
+				<h3>Дисциплины</h3>
+				<div class="cardOverflowList" id="disciplineOverflowList"></div>
+			</div>
+
+			<div class="cardSection" id="biographyOverflowSection">
+				<h3>Факты биографии</h3>
+				<div class="cardOverflowList" id="biographyOverflowList"></div>
+			</div>
+
+		</div>
+
+		<div class="cardSection sinsSection" id="sinsSection">
+			<h3 id="sinsTitle">Грехи</h3>
+			<table class="sinsTable">
+				<thead>
+					<tr><th>Значение</th><th>Грех</th><th>Обоснование</th></tr>
+				</thead>
+				<tbody id="sinsTableBody"></tbody>
+			</table>
+		</div>
+
 	</body>
 
 <script type="module" src="./js/app.js"></script>

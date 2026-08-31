@@ -23,6 +23,7 @@ export const freebieCosts = {
 		}
 	},
 
-    road: () =>  2,
-    willpower: () => 1
+	road: () => 2
 }
+
+freebieCosts.customAbilities = freebieCosts.abilities

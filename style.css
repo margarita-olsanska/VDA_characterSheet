@@ -20,7 +20,8 @@ body{
 	font-family:'EB Garamond', Georgia, 'Times New Roman', serif;
 	color:var(--ink);
 	display:flex;
-	justify-content:center;
+	flex-direction:column;
+	align-items:center;
 	padding:50px 20px;
 	min-height:100vh;
 }
@@ -102,9 +103,15 @@ h3{
 .bookmarks{
 	display:flex;
 	flex-direction:column;
-	gap:22px;
+	gap:24px;
 	align-self:flex-start;
-	margin-right:-46px;
+	margin-right:-26px;
+}
+
+.bookmarkGroup{
+	display:flex;
+	flex-direction:column;
+	gap:10px;
 }
 
 .bookmark{
@@ -119,7 +126,7 @@ h3{
 	color:var(--parchment);
 	background:linear-gradient(90deg, #8a0000 0%, var(--blood-dark) 100%);
 	border:1px solid #300;
-	padding:10px 56px 10px 24px;
+	padding:10px 36px 10px 24px;
 	cursor:pointer;
 	clip-path:polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%);
 	box-shadow:3px 4px 8px rgba(0,0,0,0.5);
@@ -292,6 +299,95 @@ select{
 	align-self:flex-start;
 }
 
+.ability.custom, .discipline.custom{
+	padding-left:6px;
+	border-left:2px solid var(--gold);
+}
+
+.abilityHeader, .disciplineHeader{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	gap:6px;
+	width:100%;
+}
+
+.disciplineHeader .disciplineSelect{
+	flex:1;
+}
+
+.removeTrait{
+	flex:0 0 auto;
+	width:18px;
+	height:18px;
+	line-height:16px;
+	padding:0;
+	border:1px solid var(--blood-dark);
+	border-radius:50%;
+	background:transparent;
+	color:var(--blood-dark);
+	font-size:13px;
+	cursor:pointer;
+}
+
+.removeTrait:hover{
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.addAbility{
+	display:flex;
+	gap:6px;
+	margin-top:10px;
+}
+
+.addAbilityInput{
+	flex:1;
+	min-width:0;
+	background:transparent;
+	border:none;
+	border-bottom:1px solid var(--ink);
+	font-family:inherit;
+	font-size:13px;
+	color:var(--ink);
+	padding:2px;
+}
+
+.addAbilityBtn, .addSlotBtn{
+	border:1px solid var(--gold);
+	background:transparent;
+	color:var(--blood-dark);
+	font-family:'EB Garamond', serif;
+	font-weight:700;
+	cursor:pointer;
+	border-radius:4px;
+}
+
+.addAbilityBtn{
+	width:24px;
+	flex:0 0 auto;
+}
+
+/* the discipline-card "+" button lives on the dark .cardSection background,
+   where the default dark-red text is nearly invisible - use a lighter tone there */
+.cardSection .addSlotBtn{
+	color:var(--gold-light);
+}
+
+.addSlotBtn{
+	margin-top:10px;
+	padding:4px 10px;
+	font-size:13px;
+	font-variant:small-caps;
+	letter-spacing:0.5px;
+	align-self:flex-start;
+}
+
+.addAbilityBtn:hover, .addSlotBtn:hover{
+	background:var(--gold);
+	color:var(--parchment);
+}
+
 .background{
 	display:flex;
 	align-items:center;
@@ -348,7 +444,7 @@ select{
 
 .bloodPoints{
 	display:grid;
-	grid-template-columns:repeat(10,20px);
+	grid-template-columns:repeat(5,20px);
 	gap:5px;
 	margin-top:10px;
 }
@@ -393,22 +489,311 @@ select{
 	font-variant:normal;
 }
 
+/* ---------- side card panel ---------- */
+
+.cardPanel{
+	width:260px;
+	flex:0 0 auto;
+	margin-left:24px;
+	display:flex;
+	flex-direction:column;
+	gap:16px;
+}
+
+.card{
+	background:linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+	border:1px solid var(--gold);
+	border-radius:4px;
+	padding:12px 14px;
+	box-shadow:0 4px 10px rgba(0,0,0,0.35);
+}
+
+.card h4{
+	margin:0 0 6px;
+	font-variant:small-caps;
+	letter-spacing:1px;
+	font-size:15px;
+	color:var(--blood-dark);
+	border-bottom:1px solid var(--gold);
+	padding-bottom:4px;
+}
+
+.cardBody{
+	font-size:13px;
+	line-height:1.4;
+	color:var(--ink);
+}
+
+.cardBody p{
+	margin:4px 0 0;
+}
+
+.card textarea{
+	width:100%;
+	min-height:80px;
+	resize:vertical;
+	background:transparent;
+	border:none;
+	font-family:inherit;
+	font-size:13px;
+	color:var(--ink);
+}
+
+.cardSection{
+	background:rgba(0,0,0,0.25);
+	border:1px solid var(--gold);
+	border-radius:4px;
+	padding:12px 14px;
+	color:var(--parchment);
+}
+
+.cardSection h3{
+	margin:0 0 8px;
+	text-align:left;
+	font-size:15px;
+	font-variant:small-caps;
+	letter-spacing:1px;
+	color:var(--gold-light);
+	border:none;
+	padding:0;
+}
+
+.cardList{
+	display:flex;
+	flex-direction:column;
+	gap:7px;
+	margin-bottom:8px;
+}
+
+.cardList .card, .cardOverflowList .card{
+	position:relative;
+	padding:10px 26px 10px 12px;
+}
+
+.cardList .card .removeTrait, .cardOverflowList .card .removeTrait{
+	position:absolute;
+	top:7px;
+	right:7px;
+}
+
+.cardList .card select, .cardOverflowList .card select{
+	width:100%;
+	margin-bottom:5px;
+	font-size:13px;
+}
+
+.cardList .card .cardBody, .cardOverflowList .card .cardBody{
+	margin-bottom:7px;
+	font-style:italic;
+}
+
+/* discipline cards (data-card-id) get regular text, unlike biography cards -
+   their body now holds a description + a bold "Правила:" rules paragraph */
+.cardList .card[data-card-id] .cardBody, .cardOverflowList .card[data-card-id] .cardBody{
+	font-style:normal;
+}
+
+.cardLevelRow{
+	display:flex;
+	align-items:center;
+	gap:7px;
+	margin-bottom:7px;
+	font-size:13px;
+	font-variant:small-caps;
+	color:var(--blood-dark);
+}
+
+.cardDisciplineName{
+	font-size:11px;
+	font-variant:small-caps;
+	letter-spacing:0.5px;
+	color:var(--blood-dark);
+	opacity:0.75;
+	margin-bottom:6px;
+}
+
+/* discipline cards (identified by data-card-id, unlike biography cards)
+   reserve a little extra bottom space for the delete-power icon */
+.cardList .card[data-card-id], .cardOverflowList .card[data-card-id]{
+	padding-bottom:26px;
+}
+
+.deletePowerBtn{
+	position:absolute;
+	bottom:6px;
+	right:6px;
+	width:18px;
+	height:18px;
+	line-height:16px;
+	text-align:center;
+	background:none;
+	border:1px solid var(--blood-dark);
+	border-radius:50%;
+	padding:0;
+	font-size:10px;
+	color:var(--blood-dark);
+	opacity:0.7;
+	cursor:pointer;
+}
+
+.deletePowerBtn:hover{
+	opacity:1;
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.cardLevelRow .dots{
+	flex-wrap:wrap;
+	gap:3px;
+}
+
+.cardLevelRow .dot{
+	width:14px;
+	height:14px;
+}
+
+.cardList .card input[type=text], .cardOverflowList .card input[type=text]{
+	width:100%;
+	margin-bottom:5px;
+	font-size:13px;
+	padding:2px;
+}
+
+.cardList .card textarea, .cardOverflowList .card textarea{
+	width:100%;
+	min-height:125px;
+	resize:vertical;
+	line-height:1.4;
+	background:transparent;
+	border:1px solid var(--gold);
+	border-radius:3px;
+	padding:4px 6px;
+	font-family:inherit;
+	font-size:13px;
+	color:var(--ink);
+}
+
+.addSlotBtn{
+	width:100%;
+}
+
+/* when the button relocates below the sheet (next to a much wider section)
+   it shouldn't stretch across the whole row - keep it card-width instead */
+.cardOverflowList + .addSlotBtn{
+	width:260px;
+	margin-top:8px;
+}
+
+/* cards that no longer fit beside the sheet spill into these rows below it -
+   discipline overflow and biography overflow each keep their own bordered
+   section, with disciplines always coming first */
+.cardOverflow{
+	display:flex;
+	flex-wrap:wrap;
+	justify-content:center;
+	align-items:flex-start;
+	gap:16px;
+	width:100%;
+	max-width:1400px;
+}
+
+.cardOverflow.hasContent{
+	margin-top:24px;
+}
+
+/* the sins table for the character's chosen road, always at the very
+   bottom of the page, below everything else */
+.sinsSection{
+	width:100%;
+	max-width:820px;
+	margin-top:24px;
+}
+
+.sinsTable{
+	width:100%;
+	border-collapse:collapse;
+	font-size:14px;
+}
+
+.sinsTable th{
+	font-variant:small-caps;
+	letter-spacing:1px;
+	font-weight:700;
+	color:var(--gold-light);
+	border-bottom:1px solid var(--gold);
+	padding:4px 10px 6px;
+	text-align:left;
+}
+
+.sinsTable td{
+	padding:5px 10px;
+	border-bottom:1px solid rgba(169,131,43,0.25);
+	vertical-align:top;
+}
+
+.sinsTable td:first-child{
+	text-align:center;
+	font-weight:700;
+	color:var(--gold-light);
+	width:8%;
+}
+
+.cardOverflowList{
+	display:flex;
+	flex-wrap:wrap;
+	gap:16px;
+}
+
+.cardOverflowList > *{
+	width:260px;
+	flex:0 0 auto;
+}
+
+@media (max-width:1180px){
+
+	.cardPanel{
+		width:220px;
+	}
+}
+
 @media (max-width:760px){
 
 	.book{
-		flex-direction:column-reverse;
+		flex-direction:column;
 		align-items:center;
 	}
 
+	.sheet{
+		order:1;
+	}
+
+	.cardPanel{
+		order:2;
+		width:100%;
+		max-width:900px;
+		margin-left:0;
+		margin-top:16px;
+	}
+
 	.bookmarks{
+		order:3;
 		flex-direction:row;
+		flex-wrap:wrap;
 		margin-right:0;
 		margin-top:14px;
+	}
+
+	/* the desktop grouping is a purely vertical/visual arrangement - on
+	   mobile the buttons go back to being one flat wrapping row, so the
+	   group wrappers are removed from layout instead of nesting rows */
+	.bookmarkGroup{
+		display:contents;
 	}
 
 	.bookmark{
 		width:auto;
 		flex:1;
+		min-width:140px;
 		clip-path:none;
 		border-radius:0 0 8px 8px;
 	}
@@ -421,3 +806,4 @@ select{
 		transform:translateY(4px);
 	}
 }
+

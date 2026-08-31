@@ -9,8 +9,12 @@ export function updateFreebie(trait, clickedLevel){
 
 	if(!type) return
 
-	// disciplines without names are ignored
+	// disciplines without names, backgrounds without a picked type are ignored
 	if(type === "disciplines" && !character.disciplines[trait]?.name){
+		return
+	}
+
+	if(type === "backgrounds" && !character.backgrounds[trait]?.type){
 		return
 	}
 

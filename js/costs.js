@@ -35,6 +35,8 @@ export const costs = {
     },
 
 	road: level => level * 2,
-	
+
 	willpower: level => level
 }
+
+costs.customAbilities = costs.abilities
