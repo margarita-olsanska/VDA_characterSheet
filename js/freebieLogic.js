@@ -1,6 +1,7 @@
 import { character } from "./character.js"
 import { freebieCosts } from "./freebieCosts.js"
 import { getTraitValue, setTraitValue, getTraitType, getTraitMin } from "./traits.js"
+import { t } from "./i18n.js"
 
 export function updateFreebie(trait, clickedLevel){
 
@@ -9,7 +10,6 @@ export function updateFreebie(trait, clickedLevel){
 
 	if(!type) return
 
-	// disciplines without names, backgrounds without a picked type are ignored
 	if(type === "disciplines" && !character.disciplines[trait]?.name){
 		return
 	}
@@ -18,10 +18,8 @@ export function updateFreebie(trait, clickedLevel){
 		return
 	}
 
-	// clicking the currently topmost filled dot removes it
 	if(clickedLevel === currentLevel) clickedLevel = Math.max(currentLevel - 1, getTraitMin(type))
 
-	// dots increment
 	if(clickedLevel > currentLevel){
 
 		let totalCost = 0
@@ -31,7 +29,7 @@ export function updateFreebie(trait, clickedLevel){
 		}
 
 		if(character.freebie < totalCost){
-			alert("Недостаточно freebie points")
+			alert(t("alert.notEnoughFreebie"))
 			return
 		}
 
@@ -40,7 +38,6 @@ export function updateFreebie(trait, clickedLevel){
 		return
 	}
 
-	// dots decrement
 	if(clickedLevel < currentLevel){
 
 		let refund = 0

@@ -1,5 +1,5 @@
 import { character } from "./character.js"
-import { clans } from "./clans.js"
+import { clans } from "./VDA20data.js"
 
 export const costs = {
 
@@ -27,7 +27,7 @@ export const costs = {
 	},
 
 	backgrounds: level => {
-		return 1   // freebie placeholder, TODO:update later
+		return 1
 	},
 
 	virtues: level => {

@@ -1,5 +1,5 @@
 import { character } from "./character.js"
-import { clans } from "./clans.js"
+import { clans } from "./VDA20data.js"
 import { costs } from "./costs.js"
 
 export function fillClanDisciplines(){
@@ -38,7 +38,6 @@ export function refundAllDisciplines(){
 			refund += costs.disciplines(lvl, slotKey)
 		}
 
-		// full reset
 		slot.name = null
 		slot.level = 0
 	}

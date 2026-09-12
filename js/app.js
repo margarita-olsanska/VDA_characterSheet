@@ -1,49 +1,57 @@
 import { character } from "./character.js"
-import { saveCharacter, loadCharacter, exportCharacterToFile, exportCharacterToHtml, importCharacterFromFile, savePowerLibrary, loadPowerLibrary, loadBackgroundTypes, loadRoadTypes, loadClans, loadDisciplineTypes, loadArchetypes, exportLibraryToFile, importLibraryFromFile } from "./storage.js"
-import { powerLibrary } from "./powerLibrary.js"
+import { saveCharacter, loadCharacter, exportCharacterToHtml, loadPowerLibrary, loadRitualLibrary, loadPathLibrary, savePathLibrary, saveRitualLibrary, loadBackgroundTypes, loadRoadTypes, loadClans, loadDisciplineTypes, loadArchetypes, loadAbilityTypes, loadAttributeTypes } from "./storage.js"
+import { clans, disciplineTypes, archetypes, backgroundTypes, roadTypes, attributeTypes, abilityTypes, pathLibrary, ritualLibrary, getEffectiveRoadSins } from "./VDA20data.js"
 import { renderSheet, renderResources, renderCreation } from "./ui.js"
-import { clans } from "./clans.js"
 import { fillClanDisciplines, refundAllDisciplines } from "./logic.js"
-import { disciplineTypes } from "./disciplineTypes.js"
 import { getState, setState, STATES } from "./state.js"
 import { updateXP } from "./editLogic.js"
 import { updateFreebie } from "./freebieLogic.js"
 import { createXP, syncCreationState } from "./creationLogic.js"
 import { generationData } from "./generation.js"
 import { getTraitType, getTraitCeiling, getTraitValue } from "./traits.js"
-import { archetypes } from "./archetypes.js"
-import { backgroundTypes } from "./backgroundTypes.js"
-import { roadTypes } from "./roadTypes.js"
+import { t, localize, applyStaticTranslations } from "./i18n.js"
+import { sortedKeysByName, bulletsForLevel } from "./utils.js"
+import { setupPortraitUI, renderPortrait } from "./portraitUI.js"
+import { setupDisciplineCardUI } from "./disciplineCardUI.js"
+import { setupPathRitualCardUI } from "./pathRitualCardUI.js"
+import { setupVaultUI } from "./vaultUI.js"
+import { setupLibraryUI } from "./libraryUI.js"
+import { setupBookmarksUI } from "./bookmarksUI.js"
+import { getActivePreset } from "./libraryPresets.js"
 
 const xpInput = document.getElementById("xpInput")
 const roadSelect = document.getElementById("roadSelect")
 const freebieInput = document.getElementById("freebieInput")
 const clanSelect = document.getElementById("clanSelect")
 const nameInput = document.getElementById("characterName")
+const conceptInput = document.getElementById("conceptInput")
+
+const conceptOptionKeys = [
+	"artist", "fighter", "vagrant", "cleric", "outcast", "intellectual",
+	"politician", "criminal", "professional", "laborer", "child", "sleuth"
+]
+
+function populateConceptOptions(){
+
+	const datalist = document.getElementById("conceptOptions")
+	datalist.innerHTML = ""
+
+	conceptOptionKeys.forEach(key => datalist.appendChild(new Option(t(`concept.${key}`))))
+}
 const genSelect = document.getElementById("generationSelect")
 const natureSelect = document.getElementById("natureSelect")
 const demeanorSelect = document.getElementById("demeanorSelect")
-
-function sortedKeysByName(dict, getName){
-	return Object.keys(dict).sort((a, b) => getName(dict[a]).localeCompare(getName(dict[b]), "ru"))
-}
-
-// renders a level as classic dot notation text, grouped in fives: 7 -> "••••• ••"
-function bulletsForLevel(level, groupSize = 5){
-
-	const groups = []
-
-	for(let i = 0; i < level; i += groupSize){
-		groups.push("•".repeat(Math.min(groupSize, level - i)))
-	}
-
-	return groups.join(" ")
-}
 
 const abilityColumns = {
 	talents: document.getElementById("talentsColumn"),
 	skills: document.getElementById("skillsColumn"),
 	knowledges: document.getElementById("knowledgesColumn")
+}
+
+const attributeColumns = {
+	physical: document.getElementById("physicalColumn"),
+	social: document.getElementById("socialColumn"),
+	mental: document.getElementById("mentalColumn")
 }
 
 function updateUI(){
@@ -53,19 +61,28 @@ function updateUI(){
 	renderResources(xpInput, freebieInput)
 	renderCreation()
 
-	// biography cards show the description for the current highest dot, so
-	// they need refreshing whenever a background's level changes too, not
-	// just when its picked type changes
 	for(const slot in character.backgrounds){
 		syncBiographyCard(slot)
 	}
 
 	renderSins()
+	renderPortrait()
+	updateRitualPathSectionVisibility()
 	layoutCards()
 }
 
-// shows the sin table for the character's chosen road at the very bottom of
-// the page, below everything else - hidden entirely while no road is picked
+function characterHasRitualPathDiscipline(){
+	return Object.values(character.disciplines).some(d => d.name && disciplineTypes[d.name]?.ritualPaths)
+}
+
+function updateRitualPathSectionVisibility(){
+
+	const display = characterHasRitualPathDiscipline() ? "" : "none"
+
+	document.getElementById("pathCardSection").style.display = display
+	document.getElementById("ritualCardSection").style.display = display
+}
+
 function renderSins(){
 
 	const section = document.getElementById("sinsSection")
@@ -77,24 +94,19 @@ function renderSins(){
 	}
 
 	section.style.display = ""
-	document.getElementById("sinsTitle").textContent = `Грехи: ${road.name}`
+	document.getElementById("sinsTitle").textContent = t("sins.headingWithRoad", localize(road.name))
 
 	const tbody = document.getElementById("sinsTableBody")
 	tbody.innerHTML = ""
 
-	road.sins.forEach(row => {
+	getEffectiveRoadSins(character.road.type).forEach(row => {
 
 		const tr = document.createElement("tr")
-		tr.innerHTML = `<td>${row.value}</td><td>${row.sin}</td><td>${row.rationale}</td>`
+		tr.innerHTML = `<td>${row.value}</td><td>${localize(row.sin)}</td><td>${localize(row.rationale)}</td>`
 		tbody.appendChild(tr)
 	})
 }
 
-// at character creation, road and willpower start at values derived from the
-// virtues (road = Совесть/Решимость + Самоконтроль/Инстинкт, willpower = Смелость)
-// instead of being bought from a point pool - after creation both are bought
-// independently with xp/freebie, like any other trait, so this only applies
-// while still in creation mode
 function syncDerivedTraits(){
 
 	if(getState() !== STATES.CREATE) return
@@ -108,69 +120,73 @@ function syncDerivedTraits(){
 	}
 }
 
-// keeps the card panel from growing taller than the sheet: once it would,
-// the newest discipline/biography cards spill below the whole book, each
-// kind kept in its own bordered section (disciplines always shown first)
+const CARD_KINDS = [
+	{ listId: "disciplineCardList", overflowListId: "disciplineOverflowList", overflowSectionId: "disciplineOverflowSection", addBtnId: "addDisciplineCardBtn" },
+	{ listId: "biographyCardList", overflowListId: "biographyOverflowList", overflowSectionId: "biographyOverflowSection", sidebarSectionId: "biographySidebarSection" },
+	{ listId: "pathCardList", overflowListId: "pathOverflowList", overflowSectionId: "pathOverflowSection", addBtnId: "addPathCardBtn" },
+	{ listId: "ritualCardList", overflowListId: "ritualOverflowList", overflowSectionId: "ritualOverflowSection", addBtnId: "addRitualCardBtn" }
+]
+
 function layoutCards(){
 
-	const disciplineOverflow = document.getElementById("disciplineOverflowList")
-	const biographyOverflow = document.getElementById("biographyOverflowList")
-	const biographySidebarSection = document.getElementById("biographySidebarSection")
+	CARD_KINDS.forEach(kind => {
 
-	// put everything back in its home list first, so this always recomputes from scratch -
-	// including making the (possibly hidden) sidebar section visible again so its height
-	// is measured correctly below
-	;[...disciplineOverflow.children].forEach(card => document.getElementById("disciplineCardList").appendChild(card))
-	;[...biographyOverflow.children].forEach(card => document.getElementById("biographyCardList").appendChild(card))
-	biographySidebarSection.style.display = ""
+		const overflow = document.getElementById(kind.overflowListId)
+		const home = document.getElementById(kind.listId)
 
-	// below this width the panel already stacks under the sheet on its own - nothing to split
+		;[...overflow.children].forEach(card => home.appendChild(card))
+
+		if(kind.sidebarSectionId) document.getElementById(kind.sidebarSectionId).style.display = ""
+	})
+
 	if(window.innerWidth > 760){
 
 		const sheet = document.querySelector(".sheet")
 		const cardPanel = document.querySelector(".cardPanel")
 		const maxHeight = sheet.getBoundingClientRect().height
 
-		const movable = [
-			...document.getElementById("disciplineCardList").children,
-			...document.getElementById("biographyCardList").children
-		]
+		const movable = CARD_KINDS.flatMap(kind => [...document.getElementById(kind.listId).children])
 
 		let i = movable.length - 1
 
 		while(i >= 0 && cardPanel.getBoundingClientRect().height > maxHeight){
 
 			const card = movable[i]
-			const target = card.dataset.homeList === "disciplineCardList" ? disciplineOverflow : biographyOverflow
+			const kind = CARD_KINDS.find(k => k.listId === card.dataset.homeList)
 
-			target.insertBefore(card, target.firstChild)
+			document.getElementById(kind.overflowListId).insertBefore(card, document.getElementById(kind.overflowListId).firstChild)
 			i--
 		}
 	}
 
-	// the sidebar's biography section has no "+" button of its own (unlike disciplines),
-	// so once every card in it has moved out (or none were ever picked), the empty
-	// header serves no purpose and should disappear rather than sit there empty
-	biographySidebarSection.style.display = document.getElementById("biographyCardList").children.length ? "" : "none"
+	let anyOverflow = false
 
-	document.getElementById("disciplineOverflowSection").style.display = disciplineOverflow.children.length ? "" : "none"
-	document.getElementById("biographyOverflowSection").style.display = biographyOverflow.children.length ? "" : "none"
+	CARD_KINDS.forEach(kind => {
 
-	// the "add" button always sits after every discipline card - if any spilled
-	// below the sheet, the button moves down there too instead of staying stuck
-	// between the sidebar's remaining cards and the overflowed ones
-	const addDisciplineCardBtn = document.getElementById("addDisciplineCardBtn")
+		const overflow = document.getElementById(kind.overflowListId)
+		const home = document.getElementById(kind.listId)
 
-	if(disciplineOverflow.children.length){
-		document.getElementById("disciplineOverflowSection").appendChild(addDisciplineCardBtn)
-	}else{
-		document.getElementById("disciplineCardList").insertAdjacentElement("afterend", addDisciplineCardBtn)
-	}
+		if(kind.sidebarSectionId){
+			document.getElementById(kind.sidebarSectionId).style.display = home.children.length ? "" : "none"
+		}
 
-	document.getElementById("cardOverflow").classList.toggle(
-		"hasContent",
-		disciplineOverflow.children.length > 0 || biographyOverflow.children.length > 0
-	)
+		document.getElementById(kind.overflowSectionId).style.display = overflow.children.length ? "" : "none"
+
+		if(kind.addBtnId){
+
+			const addBtn = document.getElementById(kind.addBtnId)
+
+			if(overflow.children.length){
+				document.getElementById(kind.overflowSectionId).appendChild(addBtn)
+			}else{
+				home.insertAdjacentElement("afterend", addBtn)
+			}
+		}
+
+		if(overflow.children.length) anyOverflow = true
+	})
+
+	document.getElementById("cardOverflow").classList.toggle("hasContent", anyOverflow)
 }
 
 function handleXP(trait, level){
@@ -187,11 +203,10 @@ function handleXP(trait, level){
 			return createXP(trait, level)
 
 		default:
-			return // ничего не делаем
+			return
 	}
 }
 
-// generates the dot spans for one .dots group and wires up their clicks
 function setupDotsGroup(group){
 
 	const trait = group.dataset.trait
@@ -218,7 +233,70 @@ function setupDotsGroup(group){
 	})
 }
 
-// (re)populates a discipline-slot <select>'s options from the current library
+
+function createAttributeRow(key){
+
+	const row = document.createElement("div")
+	row.className = "attribute"
+
+	const label = document.createElement("span")
+	label.dataset.trait = key
+	label.textContent = localize(attributeTypes[key].name)
+
+	const dots = document.createElement("div")
+	dots.className = "dots"
+	dots.dataset.trait = key
+
+	row.appendChild(label)
+	row.appendChild(dots)
+	attributeColumns[attributeTypes[key].attributeCategory].appendChild(row)
+
+	setupDotsGroup(dots)
+}
+
+function buildBuiltinAttributeRows(){
+
+	document.querySelectorAll(".attribute").forEach(el => el.remove())
+
+	for(const key in attributeTypes) createAttributeRow(key)
+}
+
+function createBuiltinAbilityRow(key, column, anchor){
+
+	const row = document.createElement("div")
+	row.className = "ability"
+
+	const label = document.createElement("span")
+	label.dataset.trait = key
+	label.textContent = localize(abilityTypes[key].name)
+
+	const dots = document.createElement("div")
+	dots.className = "dots"
+	dots.dataset.trait = key
+
+	row.appendChild(label)
+	row.appendChild(dots)
+	column.insertBefore(row, anchor)
+
+	setupDotsGroup(dots)
+}
+
+function buildBuiltinAbilityRows(){
+
+	document.querySelectorAll(".ability:not(.custom)").forEach(el => el.remove())
+
+	for(const category in abilityColumns){
+
+		const column = abilityColumns[category]
+		const anchor = column.querySelector(".ability.custom") || column.querySelector(".addAbility")
+
+		for(const key in abilityTypes){
+			if(abilityTypes[key].category !== category) continue
+			createBuiltinAbilityRow(key, column, anchor)
+		}
+	}
+}
+
 function populateDisciplineSlotOptions(select){
 
 	select.innerHTML = ""
@@ -228,15 +306,14 @@ function populateDisciplineSlotOptions(select){
 	empty.textContent = "--"
 	select.appendChild(empty)
 
-	for(const key of sortedKeysByName(disciplineTypes, d => d.name)){
+	for(const key of sortedKeysByName(disciplineTypes, d => localize(d.name))){
 		const option = document.createElement("option")
 		option.value = key
-		option.textContent = disciplineTypes[key].name
+		option.textContent = localize(disciplineTypes[key].name)
 		select.appendChild(option)
 	}
 }
 
-// populates a discipline <select>'s options and wires its change handler
 function setupDisciplineSelect(select){
 
 	populateDisciplineSlotOptions(select)
@@ -251,8 +328,6 @@ function setupDisciplineSelect(select){
 	})
 }
 
-// used after importing a library file, keeping each select's current pick
-// if it's still a valid key
 function refreshDisciplineSelectOptions(){
 
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
@@ -263,11 +338,8 @@ function refreshDisciplineSelectOptions(){
 	})
 }
 
-// shows/updates/removes the biography card that mirrors one background slot's picked type
 function syncBiographyCard(slot){
 
-	// searched globally (not scoped to the list) since the reflow logic
-	// may have moved this card down into the overflow row
 	const type = character.backgrounds[slot].type
 	let card = document.querySelector(`[data-card-slot="${slot}"]`)
 
@@ -294,22 +366,19 @@ function syncBiographyCard(slot){
 	const info = backgroundTypes[type]
 	const level = character.backgrounds[slot].level
 
-	// the picked type may no longer exist in the library (e.g. after
-	// importing a background-types file that dropped or renamed it)
 	if(!info){
-		card.querySelector("h4").textContent = "Неизвестный тип"
+		card.querySelector("h4").textContent = t("biography.unknownType")
 		card.querySelector(".cardBody").textContent = ""
 		return
 	}
 
-	card.querySelector("h4").textContent = info.name
+	card.querySelector("h4").textContent = localize(info.name)
 
 	card.querySelector(".cardBody").textContent = level > 0
-		? `${bulletsForLevel(level)} ${info.levels[level - 1]}`
-		: "Добавьте точки, чтобы увидеть описание."
+		? `${bulletsForLevel(level)} ${localize(info.levels[level - 1])}`
+		: t("biography.addDots")
 }
 
-// (re)populates a background <select>'s options from the current library
 function populateBackgroundOptions(select){
 
 	select.innerHTML = ""
@@ -319,15 +388,14 @@ function populateBackgroundOptions(select){
 	empty.textContent = "--"
 	select.appendChild(empty)
 
-	for(const key of sortedKeysByName(backgroundTypes, bg => bg.name)){
+	for(const key of sortedKeysByName(backgroundTypes, bg => localize(bg.name))){
 		const option = document.createElement("option")
 		option.value = key
-		option.textContent = backgroundTypes[key].name
+		option.textContent = localize(backgroundTypes[key].name)
 		select.appendChild(option)
 	}
 }
 
-// populates a background <select>'s options and wires its change handler
 function setupBackgroundSelect(select){
 
 	populateBackgroundOptions(select)
@@ -344,7 +412,16 @@ function setupBackgroundSelect(select){
 	})
 }
 
-// (re)populates the road <select>'s options from the current library
+function refreshBackgroundSelectOptions(){
+
+	document.querySelectorAll(".backgroundSelect").forEach(select => {
+
+		const current = select.value
+		populateBackgroundOptions(select)
+		select.value = current
+	})
+}
+
 function populateRoadOptions(select){
 
 	select.innerHTML = ""
@@ -354,10 +431,10 @@ function populateRoadOptions(select){
 	empty.textContent = "--"
 	select.appendChild(empty)
 
-	for(const key of sortedKeysByName(roadTypes, r => r.name)){
+	for(const key of sortedKeysByName(roadTypes, r => localize(r.name))){
 		const option = document.createElement("option")
 		option.value = key
-		option.textContent = roadTypes[key].name
+		option.textContent = localize(roadTypes[key].name)
 		select.appendChild(option)
 	}
 }
@@ -375,8 +452,17 @@ function setupRoadSelect(select){
 	})
 }
 
-// used after importing a library file, keeping the current pick if it's
-// still a valid key
+function setupVirtueChoiceSelect(select){
+
+	const key = select.dataset.virtue
+	select.value = character.virtueChoices[key]
+
+	select.addEventListener("change", () => {
+		character.virtueChoices[key] = select.value
+		saveCharacter()
+	})
+}
+
 function refreshRoadSelectOptions(){
 
 	const current = roadSelect.value
@@ -384,12 +470,10 @@ function refreshRoadSelectOptions(){
 	roadSelect.value = current
 }
 
-// removing a slot/ability is only allowed once its dots are back to zero,
-// so we never have to reconcile a refund across xp/freebie/creation currencies
 function removeTrait(trait, type, row){
 
 	if(getTraitValue(trait) > 0){
-		alert("Сначала снимите все точки")
+		alert(t("alert.removeDotsFirst"))
 		return
 	}
 
@@ -399,8 +483,6 @@ function removeTrait(trait, type, row){
 
 		delete character.backgrounds[trait]
 
-		// the sidebar/overflow card mirrors this slot and won't be cleaned up
-		// by the usual background-key loop once the key itself is gone
 		const card = document.querySelector(`[data-card-slot="${trait}"]`)
 		if(card) card.remove()
 
@@ -512,334 +594,186 @@ function createAbilityRow(category, id, name){
 	setupDotsGroup(dots)
 }
 
-// a small standalone 1-10 dot selector, not tied to any character trait -
-// purely descriptive flavor info shown on a discipline card
-function createLevelDots(initialLevel, onChange){
+function populateClanOptions(select){
 
-	const container = document.createElement("div")
-	container.className = "dots"
+	select.innerHTML = ""
 
-	for(let i = 0; i < 10; i++){
-		const dot = document.createElement("span")
-		dot.className = "dot"
-		container.appendChild(dot)
+	const empty = document.createElement("option")
+	empty.value = ""
+	empty.textContent = t("select.clan")
+	select.appendChild(empty)
+
+	for(const key of sortedKeysByName(clans, clan => localize(clan.name))){
+
+		const option = document.createElement("option")
+		option.value = key
+		option.textContent = localize(clans[key].name)
+
+		select.appendChild(option)
 	}
-
-	const dotEls = [...container.querySelectorAll(".dot")]
-
-	function render(level){
-		dotEls.forEach((dot, i) => dot.classList.toggle("filled", i < level))
-	}
-
-	dotEls.forEach((dot, index) => {
-
-		dot.addEventListener("click", () => {
-
-			const current = dotEls.filter(d => d.classList.contains("filled")).length
-			const newLevel = (index + 1 === current) ? current - 1 : index + 1
-
-			render(newLevel)
-			onChange(newLevel)
-		})
-	})
-
-	render(initialLevel)
-
-	return container
 }
 
-// cards created before the shared power library existed stored their own
-// discipline/level/name/description inline - fold that into a fresh library
-// entry the first time such a card is rendered, so old saves keep working
-function migrateOldCardData(id, data){
+function refreshClanSelectOptions(){
 
-	if(data.powerId !== undefined) return
-
-	let powerId = null
-
-	if(data.discipline && data.powerName){
-
-		powerId = `power_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-
-		powerLibrary[powerId] = {
-			discipline: disciplineTypes[data.discipline] ? data.discipline : sortedKeysByName(disciplineTypes, d => d.name)[0],
-			level: data.level || 1,
-			name: data.powerName,
-			description: data.powerDescription || ""
-		}
-
-		savePowerLibrary()
-	}
-
-	character.disciplineCards[id] = { powerId }
-	data.powerId = powerId
+	const current = clanSelect.value
+	populateClanOptions(clanSelect)
+	clanSelect.value = current
 }
 
-// discipline cards reference one entry from the shared power library (which
-// discipline, at what level, its name, its description). Picking
-// "+ создать новую силу" opens a small form that saves a brand new entry
-// into that library, so the player builds up a reusable catalog through the
-// app instead of retyping the same power for every card
-function createDisciplineCard(id, data){
+function populateArchetypeSelect(select, placeholderKey){
 
-	migrateOldCardData(id, data)
+	select.innerHTML = ""
 
-	const list = document.getElementById("disciplineCardList")
+	const empty = document.createElement("option")
+	empty.value = ""
+	empty.textContent = t(placeholderKey)
+	select.appendChild(empty)
 
-	const card = document.createElement("div")
-	card.className = "card"
-	card.dataset.cardId = id
-	card.dataset.homeList = "disciplineCardList"
-
-	const removeBtn = document.createElement("button")
-	removeBtn.type = "button"
-	removeBtn.className = "removeTrait"
-	removeBtn.textContent = "×"
-	removeBtn.addEventListener("click", () => {
-		delete character.disciplineCards[id]
-		card.remove()
-		updateUI()
-		saveCharacter()
-	})
-
-	const powerSelect = document.createElement("select")
-	const viewBox = document.createElement("div")
-	const formBox = document.createElement("div")
-	formBox.style.display = "none"
-
-	function refreshOptions(selectedId){
-
-		powerSelect.innerHTML = ""
-		powerSelect.appendChild(new Option("-- Выбрать силу --", ""))
-		powerSelect.appendChild(new Option("+ Создать новую силу", "__new__"))
-
-		const byDiscipline = {}
-		for(const pid in powerLibrary){
-			const disc = powerLibrary[pid].discipline
-			if(!byDiscipline[disc]) byDiscipline[disc] = []
-			byDiscipline[disc].push(pid)
-		}
-
-		for(const discKey of sortedKeysByName(disciplineTypes, d => d.name)){
-
-			const ids = byDiscipline[discKey]
-			if(!ids || !ids.length) continue
-
-			const group = document.createElement("optgroup")
-			group.label = disciplineTypes[discKey].name
-
-			ids
-				.sort((a, b) => powerLibrary[a].level - powerLibrary[b].level)
-				.forEach(pid => group.appendChild(new Option(`${bulletsForLevel(powerLibrary[pid].level)} ${powerLibrary[pid].name}`, pid)))
-
-			powerSelect.appendChild(group)
-		}
-
-		powerSelect.value = selectedId || ""
+	for(const key of sortedKeysByName(archetypes, archetype => localize(archetype.name))){
+		const option = document.createElement("option")
+		option.value = key
+		option.textContent = localize(archetypes[key].name)
+		select.appendChild(option)
 	}
-
-	function renderView(powerId){
-
-		const p = powerLibrary[powerId]
-
-		viewBox.innerHTML = ""
-
-		if(!p){
-			viewBox.style.display = "none"
-			return
-		}
-
-		viewBox.style.display = ""
-		formBox.style.display = "none"
-
-		// the power's name + level already shows as the selected option in
-		// powerSelect itself - no need to repeat it here
-		const disciplineLine = document.createElement("div")
-		disciplineLine.className = "cardDisciplineName"
-		disciplineLine.textContent = disciplineTypes[p.discipline]?.name || p.discipline
-
-		const body = document.createElement("div")
-		body.className = "cardBody"
-
-		const descPara = document.createElement("p")
-		descPara.textContent = p.description
-		body.appendChild(descPara)
-
-		if(p.rules){
-
-			const rulesPara = document.createElement("p")
-			const rulesLabel = document.createElement("strong")
-			rulesLabel.textContent = "Правила:"
-
-			rulesPara.appendChild(rulesLabel)
-			rulesPara.appendChild(document.createTextNode(" " + p.rules))
-
-			body.appendChild(rulesPara)
-		}
-
-		const deleteBtn = document.createElement("button")
-		deleteBtn.type = "button"
-		deleteBtn.className = "deletePowerBtn"
-		deleteBtn.textContent = "🗑"
-		deleteBtn.title = "Удалить силу из библиотеки"
-		deleteBtn.addEventListener("click", () => deletePowerFromLibrary(powerId))
-
-		viewBox.appendChild(disciplineLine)
-		viewBox.appendChild(body)
-		viewBox.appendChild(deleteBtn)
-	}
-
-	// the "create a new power" form - filled in once, then saved into the shared library
-	const formDisciplineSelect = document.createElement("select")
-	for(const key of sortedKeysByName(disciplineTypes, d => d.name)){
-		formDisciplineSelect.appendChild(new Option(disciplineTypes[key].name, key))
-	}
-
-	const formLevelRow = document.createElement("div")
-	formLevelRow.className = "cardLevelRow"
-	const formLevelLabel = document.createElement("span")
-	formLevelLabel.textContent = "Уровень"
-	let formLevel = 1
-	const formLevelDots = createLevelDots(formLevel, newLevel => { formLevel = newLevel })
-	formLevelRow.appendChild(formLevelLabel)
-	formLevelRow.appendChild(formLevelDots)
-
-	const formNameInput = document.createElement("input")
-	formNameInput.type = "text"
-	formNameInput.maxLength = 100
-	formNameInput.placeholder = "Название силы"
-
-	const formDescArea = document.createElement("textarea")
-	formDescArea.maxLength = 3000
-	formDescArea.placeholder = "Описание силы..."
-
-	const formRulesArea = document.createElement("textarea")
-	formRulesArea.maxLength = 3000
-	formRulesArea.placeholder = "Правила силы..."
-
-	const saveBtn = document.createElement("button")
-	saveBtn.type = "button"
-	saveBtn.className = "addSlotBtn"
-	saveBtn.textContent = "Сохранить в библиотеку"
-
-	saveBtn.addEventListener("click", () => {
-
-		const name = formNameInput.value.trim()
-
-		if(!name){
-			alert("Введите название силы")
-			return
-		}
-
-		const powerId = `power_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-
-		powerLibrary[powerId] = {
-			discipline: formDisciplineSelect.value,
-			level: formLevel,
-			name,
-			description: formDescArea.value,
-			rules: formRulesArea.value
-		}
-
-		savePowerLibrary()
-
-		character.disciplineCards[id].powerId = powerId
-		saveCharacter()
-
-		refreshOptions(powerId)
-		renderView(powerId)
-
-		formNameInput.value = ""
-		formDescArea.value = ""
-		formRulesArea.value = ""
-
-		updateUI()
-	})
-
-	formBox.appendChild(formDisciplineSelect)
-	formBox.appendChild(formLevelRow)
-	formBox.appendChild(formNameInput)
-	formBox.appendChild(formDescArea)
-	formBox.appendChild(formRulesArea)
-	formBox.appendChild(saveBtn)
-
-	powerSelect.addEventListener("change", () => {
-
-		if(powerSelect.value === "__new__"){
-			viewBox.style.display = "none"
-			formBox.style.display = ""
-			return
-		}
-
-		character.disciplineCards[id].powerId = powerSelect.value || null
-		saveCharacter()
-
-		renderView(powerSelect.value)
-		updateUI()
-	})
-
-	refreshOptions(data.powerId)
-	renderView(data.powerId)
-
-	card.appendChild(removeBtn)
-	card.appendChild(powerSelect)
-	card.appendChild(viewBox)
-	card.appendChild(formBox)
-
-	list.appendChild(card)
 }
 
-// re-reads every background <select>'s option list from the library -
-// used after importing a background-types file, keeping each select's
-// current pick if it's still a valid key
-function refreshBackgroundSelectOptions(){
+function refreshArchetypeSelects(){
 
-	document.querySelectorAll(".backgroundSelect").forEach(select => {
+	const nature = natureSelect.value
+	const demeanor = demeanorSelect.value
 
-		const current = select.value
-		populateBackgroundOptions(select)
-		select.value = current
-	})
+	populateArchetypeSelect(natureSelect, "select.nature")
+	populateArchetypeSelect(demeanorSelect, "select.demeanor")
+
+	natureSelect.value = nature
+	demeanorSelect.value = demeanor
 }
 
-// rebuilds every discipline card from character.disciplineCards - used after
-// a library deletion, since each card manages its own select/view state
-// internally and there's no other way to make them all notice the change
-function rebuildDisciplineCards(){
+function resetCustomRows(){
+
+	document.querySelectorAll(".discipline.custom, .background.custom, .ability.custom").forEach(el => el.remove())
 
 	document.getElementById("disciplineCardList").innerHTML = ""
 	document.getElementById("disciplineOverflowList").innerHTML = ""
-
-	for(const id in character.disciplineCards){
-		createDisciplineCard(id, character.disciplineCards[id])
-	}
-
-	layoutCards()
+	document.getElementById("biographyCardList").innerHTML = ""
+	document.getElementById("biographyOverflowList").innerHTML = ""
+	document.getElementById("pathCardList").innerHTML = ""
+	document.getElementById("pathOverflowList").innerHTML = ""
+	document.getElementById("ritualCardList").innerHTML = ""
+	document.getElementById("ritualOverflowList").innerHTML = ""
 }
 
-// deleting a power removes it for every card on every character that
-// references it, so it asks for confirmation and then unlinks any card
-// here that was pointing at it
-function deletePowerFromLibrary(powerId){
+function backfillCustomRows(){
 
-	const power = powerLibrary[powerId]
-	if(!power) return
-
-	const confirmed = confirm(`Удалить силу "${power.name}" из библиотеки? Она также пропадёт со всех карточек, где выбрана.`)
-	if(!confirmed) return
-
-	delete powerLibrary[powerId]
-	savePowerLibrary()
-
-	for(const cardId in character.disciplineCards){
-		if(character.disciplineCards[cardId].powerId === powerId){
-			character.disciplineCards[cardId].powerId = null
+	for(const slotKey in character.disciplines){
+		if(!document.querySelector(`.dots[data-trait="${slotKey}"]`)){
+			createDisciplineRow(slotKey)
 		}
 	}
 
-	saveCharacter()
-	rebuildDisciplineCards()
+	for(const id in character.customAbilities){
+		if(!document.querySelector(`.dots[data-trait="${id}"]`)){
+			const { category, name } = character.customAbilities[id]
+			createAbilityRow(category, id, name)
+		}
+	}
+
+	for(const slot in character.backgrounds){
+		if(!document.querySelector(`.dots[data-trait="${slot}"]`)){
+			createBackgroundRow(slot)
+		}
+		syncBiographyCard(slot)
+	}
+
+	for(const id in character.disciplineCards){
+		if(!document.querySelector(`[data-card-id="${id}"]`)){
+			createDisciplineCard(id, character.disciplineCards[id])
+		}
+	}
+
+	for(const id in character.pathCards){
+		if(!document.querySelector(`[data-card-id="${id}"]`)){
+			createPathCard(id, character.pathCards[id])
+		}
+	}
+
+	for(const id in character.ritualCards){
+		if(!document.querySelector(`[data-card-id="${id}"]`)){
+			createRitualCard(id, character.ritualCards[id])
+		}
+	}
 }
+
+
+const { createDisciplineCard, rebuildDisciplineCards, deletePowerFromLibrary } = setupDisciplineCardUI({ updateUI })
+
+const {
+	createPathCard, rebuildPathCards, deletePathFromLibrary,
+	createRitualCard, rebuildRitualCards, deleteRitualFromLibrary
+} = setupPathRitualCardUI({ updateUI, pathLibrary, savePathLibrary, ritualLibrary, saveRitualLibrary })
+
+setupPortraitUI()
+
+function refreshLibraryDependentUI(){
+	refreshClanSelectOptions()
+	refreshDisciplineSelectOptions()
+	refreshArchetypeSelects()
+	refreshBackgroundSelectOptions()
+	refreshRoadSelectOptions()
+	rebuildDisciplineCards()
+	rebuildPathCards()
+	rebuildRitualCards()
+	buildBuiltinAttributeRows()
+	buildBuiltinAbilityRows()
+	applyPresetTheme()
+	populateConceptOptions()
+
+	updateUI()
+}
+
+function applyPresetTheme(){
+
+	const isMasquerade = getActivePreset().id === "masquerade"
+
+	document.body.classList.toggle("themeMasquerade", isMasquerade)
+	document.getElementById("sheetTitle").textContent = isMasquerade ? "VAMPIRE: THE MASQUERADE" : "VAMPIRE: THE DARK AGES"
+}
+
+const { hideVaultScreen, saveCharacterSmart } = setupVaultUI({
+
+	onCharacterLoaded: () => {
+		resetCustomRows()
+		backfillCustomRows()
+		updateUI()
+		saveCharacter()
+	},
+
+	afterHide: updateUI
+})
+
+const { hideLibraryScreen } = setupLibraryUI({
+	onLibraryChanged: refreshLibraryDependentUI,
+	afterHide: updateUI,
+	deletePowerFromLibrary,
+	deletePathFromLibrary,
+	deleteRitualFromLibrary
+})
+
+setupBookmarksUI({
+
+	updateUI,
+
+	hideOverlayScreens: () => {
+		hideVaultScreen()
+		hideLibraryScreen()
+	},
+
+	refreshLibraryDependentUI,
+	resetCustomRows,
+	backfillCustomRows,
+	saveCharacterSmart
+})
+
 
 xpInput.addEventListener("input", () => {
 	character.xp = parseInt(xpInput.value) || 0
@@ -856,21 +790,23 @@ nameInput.addEventListener("input", () => {
 	saveCharacter()
 })
 
+conceptInput.addEventListener("input", () => {
+	character.concept = conceptInput.value
+	saveCharacter()
+})
+
 document.getElementById("sireNotes").addEventListener("input", (e) => {
 	character.sireNotes = e.target.value
 	saveCharacter()
 })
 
-document.getElementById("addDisciplineCardBtn").addEventListener("click", () => {
+document.getElementById("clanFlawNotes").addEventListener("input", (e) => {
+	character.clanFlaw = e.target.value
+	saveCharacter()
+})
 
-	const id = `dcard_${Date.now()}_${Math.floor(Math.random() * 1000)}`
-
-	const data = { powerId: null }
-	character.disciplineCards[id] = data
-
-	createDisciplineCard(id, data)
-
-	updateUI()
+document.getElementById("notesText").addEventListener("input", (e) => {
+	character.notes = e.target.value
 	saveCharacter()
 })
 
@@ -890,164 +826,33 @@ genSelect.addEventListener("change", () => {
 	saveCharacter()
 })
 
-document.getElementById("btnCreation").onclick = () => {
-	setState(STATES.CREATE)
-	updateUI()
-}
-
-document.getElementById("btnFreebie").onclick = () => {
-	setState(STATES.FREEBIE)
-	updateUI()
-}
-
-document.getElementById("btnEdit").onclick = () => {
-	setState(STATES.EDIT)
-	updateUI()
-}
-
-document.getElementById("btnView").onclick = () => {
-	setState(STATES.VIEW)
-	updateUI()
-}
-
-document.getElementById("btnSaveJson").onclick = () => {
-	exportCharacterToFile()
-}
-
 document.getElementById("btnSaveHtml").onclick = () => {
 	exportCharacterToHtml()
 }
-
-document.getElementById("btnLoadJson").onclick = () => {
-	document.getElementById("loadFileInput").click()
-}
-
-document.getElementById("loadFileInput").addEventListener("change", (e) => {
-
-	const file = e.target.files[0]
-	if(!file) return
-
-	importCharacterFromFile(file, () => {
-		backfillCustomRows()
-		updateUI()
-		saveCharacter()
-	})
-
-	e.target.value = ""
-})
-
-document.getElementById("btnSaveLibrary").onclick = () => {
-	exportLibraryToFile()
-}
-
-document.getElementById("btnLoadLibrary").onclick = () => {
-	document.getElementById("loadLibraryInput").click()
-}
-
-document.getElementById("loadLibraryInput").addEventListener("change", (e) => {
-
-	const file = e.target.files[0]
-	if(!file) return
-
-	importLibraryFromFile(file, () => {
-		rebuildDisciplineCards()
-		refreshBackgroundSelectOptions()
-		refreshRoadSelectOptions()
-		refreshClanSelectOptions()
-		refreshDisciplineSelectOptions()
-		refreshArchetypeSelects()
-		updateUI()
-		saveCharacter()
-	})
-
-	e.target.value = ""
-})
 
 clanSelect.addEventListener("change", () => {
 
 	const newClan = clanSelect.value
 
-	// refund all XP and clean up
 	refundAllDisciplines()
 
-	// then change the clan
 	character.clan = newClan
 
-	// then add new clan disciplines
 	fillClanDisciplines()
 
 	updateUI()
 	saveCharacter()
 })
 
-// (re)populates the clan <select>'s options from the current library
-function populateClanOptions(select){
-
-	select.innerHTML = ""
-
-	const empty = document.createElement("option")
-	empty.value = ""
-	empty.textContent = "-- Выберите клан --"
-	select.appendChild(empty)
-
-	for(const key of sortedKeysByName(clans, clan => clan.name)){
-
-		const option = document.createElement("option")
-		option.value = key                  // brujah
-		option.textContent = clans[key].name // "Бруха"
-
-		select.appendChild(option)
-	}
-}
-
-// used after importing a library file, keeping the current pick if it's
-// still a valid key
-function refreshClanSelectOptions(){
-
-	const current = clanSelect.value
-	populateClanOptions(clanSelect)
-	clanSelect.value = current
-}
-
-// nature / demeanor archetypes, alphabetically
-function populateArchetypeSelect(select, placeholder){
-
-	select.innerHTML = ""
-
-	const empty = document.createElement("option")
-	empty.value = ""
-	empty.textContent = placeholder
-	select.appendChild(empty)
-
-	for(const key of sortedKeysByName(archetypes, archetype => archetype.name)){
-		const option = document.createElement("option")
-		option.value = key
-		option.textContent = archetypes[key].name
-		select.appendChild(option)
-	}
-}
-
-// used after importing a library file, keeping each select's current pick
-// if it's still a valid key
-function refreshArchetypeSelects(){
-
-	const nature = natureSelect.value
-	const demeanor = demeanorSelect.value
-
-	populateArchetypeSelect(natureSelect, "-- Выберите натуру --")
-	populateArchetypeSelect(demeanorSelect, "-- Выберите маску --")
-
-	natureSelect.value = nature
-	demeanorSelect.value = demeanor
-}
-
 natureSelect.addEventListener("change", () => {
 	character.nature = natureSelect.value || null
+	updateUI()
 	saveCharacter()
 })
 
 demeanorSelect.addEventListener("change", () => {
 	character.demeanor = demeanorSelect.value || null
+	updateUI()
 	saveCharacter()
 })
 
@@ -1125,7 +930,14 @@ document.querySelectorAll(".willpowerCurrent input").forEach((cb, index) => {
 	})
 })
 
-//blood
+document.querySelectorAll(".healthInput").forEach((input, index) => {
+
+	input.addEventListener("input", () => {
+		character.health[index] = input.value
+		saveCharacter()
+	})
+})
+
 document.querySelectorAll(".bloodPoints input").forEach((cb, index) => {
 
 	cb.addEventListener("click", () => {
@@ -1140,63 +952,41 @@ document.querySelectorAll(".bloodPoints input").forEach((cb, index) => {
 	})
 })
 
-// creates DOM rows for any discipline slot / custom ability that doesn't
-// have one yet - safe to call repeatedly (e.g. after loading a new save file)
-function backfillCustomRows(){
 
-	for(const slotKey in character.disciplines){
-		if(!document.querySelector(`.dots[data-trait="${slotKey}"]`)){
-			createDisciplineRow(slotKey)
-		}
-	}
-
-	for(const id in character.customAbilities){
-		if(!document.querySelector(`.dots[data-trait="${id}"]`)){
-			const { category, name } = character.customAbilities[id]
-			createAbilityRow(category, id, name)
-		}
-	}
-
-	for(const slot in character.backgrounds){
-		if(!document.querySelector(`.dots[data-trait="${slot}"]`)){
-			createBackgroundRow(slot)
-		}
-		syncBiographyCard(slot)
-	}
-
-	for(const id in character.disciplineCards){
-		if(!document.querySelector(`[data-card-id="${id}"]`)){
-			createDisciplineCard(id, character.disciplineCards[id])
-		}
-	}
-}
-
-// the whole library (power library, background types, road types, clans,
-// discipline types, archetypes) must be loaded before any select is
-// populated or discipline card rendered, and the character before we know
-// which extra discipline slots / custom abilities / cards need building
 loadPowerLibrary()
+loadRitualLibrary()
+loadPathLibrary()
 loadBackgroundTypes()
 loadRoadTypes()
 loadClans()
 loadDisciplineTypes()
 loadArchetypes()
+loadAbilityTypes()
+loadAttributeTypes()
 loadCharacter()
 
-// wire up whatever is already in the static HTML template
+if(character.creation.active) setState(STATES.CREATE)
+
 document.querySelectorAll(".dots").forEach(setupDotsGroup)
 document.querySelectorAll(".disciplineSelect").forEach(setupDisciplineSelect)
 document.querySelectorAll(".backgroundSelect").forEach(setupBackgroundSelect)
 setupRoadSelect(roadSelect)
+document.querySelectorAll(".virtueChoiceSelect").forEach(setupVirtueChoiceSelect)
 populateClanOptions(clanSelect)
-populateArchetypeSelect(natureSelect, "-- Выберите натуру --")
-populateArchetypeSelect(demeanorSelect, "-- Выберите маску --")
+populateArchetypeSelect(natureSelect, "select.nature")
+populateArchetypeSelect(demeanorSelect, "select.demeanor")
+
+buildBuiltinAttributeRows()
+buildBuiltinAbilityRows()
 
 backfillCustomRows()
 
+applyStaticTranslations()
+applyPresetTheme()
+populateConceptOptions()
+
 updateUI()
 
-// the sheet's height (and so how many cards fit beside it) can change on resize
 let resizeTimeout
 window.addEventListener("resize", () => {
 	clearTimeout(resizeTimeout)

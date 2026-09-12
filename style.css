@@ -4,10 +4,28 @@
 	--ink:#2b1d10;
 	--blood:#7b0000;
 	--blood-dark:#4a0000;
+	--blood-bright:#8a0000;
+	--blood-shadow:#300;
+	--blood-rgb:123,0,0;
 	--gold:#a9832b;
 	--gold-light:#d9b95c;
+	--gold-dark:#7a5c1a;
+	--gold-rgb:169,131,43;
 	--parchment:#f2e6c8;
 	--parchment-dark:#e6d5a8;
+}
+
+
+body.themeMasquerade{
+	--blood:#1f6b35;
+	--blood-dark:#123018;
+	--blood-bright:#2d8049;
+	--blood-shadow:#04150a;
+	--blood-rgb:31,107,53;
+	--gold:#8a8a8a;
+	--gold-light:#c9c9c9;
+	--gold-dark:#5a5a5a;
+	--gold-rgb:138,138,138;
 }
 
 *{
@@ -26,6 +44,39 @@ body{
 	min-height:100vh;
 }
 
+
+
+.langSwitch{
+	display:flex;
+	gap:6px;
+	margin-bottom:14px;
+}
+
+.langBtn{
+	padding:4px 16px;
+	font-family:'EB Garamond', serif;
+	font-size:13px;
+	font-weight:700;
+	font-variant:small-caps;
+	letter-spacing:1px;
+	color:var(--parchment);
+	background:linear-gradient(90deg, var(--blood-bright) 0%, var(--blood-dark) 100%);
+	border:1px solid var(--blood-shadow);
+	border-radius:3px;
+	cursor:pointer;
+	box-shadow:2px 3px 6px rgba(0,0,0,0.4);
+}
+
+.langBtn:hover{
+	filter:brightness(1.15);
+}
+
+.langBtn.active{
+	background:linear-gradient(90deg, var(--gold-light) 0%, var(--gold) 100%);
+	color:var(--ink);
+	border-color:var(--gold-dark);
+}
+
 .book{
 	display:flex;
 	align-items:flex-start;
@@ -33,7 +84,17 @@ body{
 	max-width:100%;
 }
 
-/* ---------- the page itself ---------- */
+
+.book.overlayShown .bookmarks{
+	margin-right:0;
+}
+
+.book.overlayShown .bookmark.active,
+.book.overlayShown .bookmark.active:hover{
+	transform:none;
+}
+
+
 
 .sheet{
 	position:relative;
@@ -41,14 +102,14 @@ body{
 	width:900px;
 	max-width:100%;
 	background:
-		radial-gradient(circle at 15% 20%, rgba(169,131,43,0.10), transparent 40%),
-		radial-gradient(circle at 85% 75%, rgba(169,131,43,0.10), transparent 40%),
+		radial-gradient(circle at 15% 20%, rgba(var(--gold-rgb),0.10), transparent 40%),
+		radial-gradient(circle at 85% 75%, rgba(var(--gold-rgb),0.10), transparent 40%),
 		linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
 	padding:36px 46px 46px;
 	border-radius:2px;
 	box-shadow:
-		inset 0 0 0 1px rgba(169,131,43,0.6),
-		inset 0 0 60px rgba(123,0,0,0.06),
+		inset 0 0 0 1px rgba(var(--gold-rgb),0.6),
+		inset 0 0 60px rgba(var(--blood-rgb),0.06),
 		0 25px 60px rgba(0,0,0,0.65),
 		0 0 0 10px #efe0b8,
 		0 0 0 13px var(--blood);
@@ -59,7 +120,7 @@ body{
 	position:absolute;
 	inset:14px;
 	pointer-events:none;
-	border:1px solid rgba(123,0,0,0.35);
+	border:1px solid rgba(var(--blood-rgb),0.35);
 }
 
 h1{
@@ -72,6 +133,7 @@ h1{
 	margin-top:0;
 	text-shadow:0 1px 0 rgba(255,255,255,0.45);
 }
+
 
 
 h2{
@@ -98,7 +160,7 @@ h3{
 	padding-bottom:3px;
 }
 
-/* ---------- vertical bookmarks ---------- */
+
 
 .bookmarks{
 	display:flex;
@@ -124,8 +186,8 @@ h3{
 	font-variant:small-caps;
 	letter-spacing:1px;
 	color:var(--parchment);
-	background:linear-gradient(90deg, #8a0000 0%, var(--blood-dark) 100%);
-	border:1px solid #300;
+	background:linear-gradient(90deg, var(--blood-bright) 0%, var(--blood-dark) 100%);
+	border:1px solid var(--blood-shadow);
 	padding:10px 36px 10px 24px;
 	cursor:pointer;
 	clip-path:polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%);
@@ -142,7 +204,7 @@ h3{
 	z-index:2;
 	background:linear-gradient(90deg, var(--gold-light) 0%, var(--gold) 100%);
 	color:var(--ink);
-	border-color:#7a5c1a;
+	border-color:var(--gold-dark);
 	transform:translateX(14px);
 	box-shadow:4px 5px 10px rgba(0,0,0,0.55);
 }
@@ -157,7 +219,19 @@ h3{
 	border-color:#2a1a0a;
 }
 
-/* ---------- top resource bar ---------- */
+
+.bookmark:disabled{
+	cursor:default;
+	opacity:0.6;
+	filter:grayscale(0.4);
+}
+
+.bookmark:disabled:hover{
+	transform:none;
+	filter:grayscale(0.4);
+}
+
+
 
 .resources{
 	display:flex;
@@ -165,7 +239,7 @@ h3{
 	align-items:center;
 	gap:22px;
 	justify-content:center;
-	background:rgba(123,0,0,0.06);
+	background:rgba(var(--blood-rgb),0.06);
 	border-top:1px solid var(--gold);
 	border-bottom:1px solid var(--gold);
 	padding:8px 10px;
@@ -191,14 +265,30 @@ h3{
 	text-align:center;
 }
 
-#creationInfo{
-	flex-basis:100%;
+#creationInfoAttributes, #creationInfoAbilities, #creationInfoAdvantages{
+	margin-top:8px;
+	background:rgba(var(--blood-rgb),0.08);
+	border:1px solid var(--gold);
+	border-radius:3px;
+	padding:4px 6px;
+}
+
+
+#creationInfoAdvantages{
+	max-width:420px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+
+#creationInfoAttributes:empty, #creationInfoAbilities:empty, #creationInfoAdvantages:empty{
+	display:none;
 }
 
 .creationTable{
 	width:100%;
 	max-width:480px;
-	margin:6px auto 0;
+	margin:0 auto;
 	border-collapse:collapse;
 	font-variant:normal;
 	font-size:15px;
@@ -221,7 +311,7 @@ h3{
 .creationTable td{
 	padding:3px 10px;
 	text-align:center;
-	border-bottom:1px solid rgba(169,131,43,0.25);
+	border-bottom:1px solid rgba(var(--gold-rgb),0.25);
 }
 
 .creationTable td:first-child{
@@ -284,6 +374,8 @@ select{
 
 .columns > div{
 	width:30%;
+
+	min-width:0;
 }
 
 .attribute, .ability, .discipline, .virtue{
@@ -295,8 +387,13 @@ select{
 	gap:3px;
 }
 
+.virtue select{
+	max-width:100%;
+}
+
 .discipline .disciplineSelect{
 	align-self:flex-start;
+	max-width:100%;
 }
 
 .ability.custom, .discipline.custom{
@@ -368,10 +465,22 @@ select{
 	flex:0 0 auto;
 }
 
-/* the discipline-card "+" button lives on the dark .cardSection background,
-   where the default dark-red text is nearly invisible - use a lighter tone there */
+
 .cardSection .addSlotBtn{
 	color:var(--gold-light);
+}
+
+
+.vaultScreen .addSlotBtn, .libraryScreen .addSlotBtn{
+	background:linear-gradient(90deg, var(--gold-light) 0%, var(--gold) 100%);
+	color:var(--ink);
+	border-color:var(--gold-dark);
+}
+
+.vaultScreen .addSlotBtn:hover, .libraryScreen .addSlotBtn:hover{
+	background:linear-gradient(90deg, var(--gold-light) 0%, var(--gold) 100%);
+	color:var(--ink);
+	filter:brightness(1.08);
 }
 
 .addSlotBtn{
@@ -394,6 +503,11 @@ select{
 	margin-top:6px;
 	font-size:15px;
 	gap:10px;
+}
+
+.backgroundSelect{
+	flex:1;
+	min-width:0;
 }
 
 .background input[type=text]{
@@ -484,12 +598,39 @@ select{
 
 .healthPoints label{
 	display:flex;
-	justify-content:space-between;
+	align-items:center;
+	gap:6px;
 	color:var(--ink);
 	font-variant:normal;
 }
 
-/* ---------- side card panel ---------- */
+.healthPoints label > span:first-child{
+	flex:1;
+}
+
+
+.healthPenalty{
+	flex:0 0 20px;
+	text-align:center;
+	font-size:13px;
+	opacity:0.75;
+}
+
+.healthInput{
+	width:22px;
+	height:22px;
+	padding:0;
+	text-align:center;
+	font-family:inherit;
+	font-size:14px;
+	font-weight:700;
+	color:var(--blood-dark);
+	background:transparent;
+	border:1px solid var(--ink);
+	border-radius:2px;
+}
+
+
 
 .cardPanel{
 	width:260px;
@@ -506,6 +647,40 @@ select{
 	border-radius:4px;
 	padding:12px 14px;
 	box-shadow:0 4px 10px rgba(0,0,0,0.35);
+}
+
+
+.portraitCard{
+	padding:8px;
+}
+
+.portraitBox{
+	width:100%;
+	aspect-ratio:3/4;
+	border:2px solid var(--gold);
+	border-radius:3px;
+	background:rgba(0,0,0,0.06);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	overflow:hidden;
+	cursor:pointer;
+	text-align:center;
+	font-size:13px;
+	font-variant:small-caps;
+	letter-spacing:0.5px;
+	color:var(--blood-dark);
+}
+
+.portraitBox:hover{
+	border-color:var(--gold-light);
+	filter:brightness(1.05);
+}
+
+.portraitBox img{
+	width:100%;
+	height:100%;
+	object-fit:cover;
 }
 
 .card h4{
@@ -587,8 +762,7 @@ select{
 	font-style:italic;
 }
 
-/* discipline cards (data-card-id) get regular text, unlike biography cards -
-   their body now holds a description + a bold "Правила:" rules paragraph */
+
 .cardList .card[data-card-id] .cardBody, .cardOverflowList .card[data-card-id] .cardBody{
 	font-style:normal;
 }
@@ -612,8 +786,7 @@ select{
 	margin-bottom:6px;
 }
 
-/* discipline cards (identified by data-card-id, unlike biography cards)
-   reserve a little extra bottom space for the delete-power icon */
+
 .cardList .card[data-card-id], .cardOverflowList .card[data-card-id]{
 	padding-bottom:26px;
 }
@@ -677,16 +850,13 @@ select{
 	width:100%;
 }
 
-/* when the button relocates below the sheet (next to a much wider section)
-   it shouldn't stretch across the whole row - keep it card-width instead */
+
 .cardOverflowList + .addSlotBtn{
 	width:260px;
 	margin-top:8px;
 }
 
-/* cards that no longer fit beside the sheet spill into these rows below it -
-   discipline overflow and biography overflow each keep their own bordered
-   section, with disciplines always coming first */
+
 .cardOverflow{
 	display:flex;
 	flex-wrap:wrap;
@@ -701,8 +871,7 @@ select{
 	margin-top:24px;
 }
 
-/* the sins table for the character's chosen road, always at the very
-   bottom of the page, below everything else */
+
 .sinsSection{
 	width:100%;
 	max-width:820px;
@@ -727,7 +896,7 @@ select{
 
 .sinsTable td{
 	padding:5px 10px;
-	border-bottom:1px solid rgba(169,131,43,0.25);
+	border-bottom:1px solid rgba(var(--gold-rgb),0.25);
 	vertical-align:top;
 }
 
@@ -736,6 +905,355 @@ select{
 	font-weight:700;
 	color:var(--gold-light);
 	width:8%;
+}
+
+
+
+.vaultScreen{
+	flex:1;
+	min-width:0;
+	max-width:1100px;
+	text-align:center;
+	color:var(--parchment);
+	padding:20px;
+}
+
+.vaultScreen h2{
+	font-variant:small-caps;
+	letter-spacing:1.5px;
+	color:var(--gold-light);
+	margin-bottom:14px;
+}
+
+.vaultCharacterActions, .libraryFileActions, .libraryPresetBar{
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	gap:10px;
+	flex-wrap:wrap;
+	margin-bottom:16px;
+	padding-bottom:14px;
+	border-bottom:1px solid rgba(var(--gold-rgb),0.4);
+}
+
+
+.vaultCharacterActions .addSlotBtn, .libraryFileActions .addSlotBtn, .libraryPresetBar .addSlotBtn{
+	width:auto;
+	margin-top:0;
+}
+
+.libraryPresetBar label{
+	color:var(--parchment);
+	font-variant:small-caps;
+	letter-spacing:0.5px;
+}
+
+.libraryPresetBar select{
+	background:var(--blood-dark);
+	color:var(--parchment);
+	border:1px solid var(--gold);
+	border-radius:3px;
+	padding:4px 8px;
+	font-family:inherit;
+	font-size:13px;
+}
+
+.libraryPresetBar select option, .libraryPresetBar select optgroup{
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.vaultBackendNote{
+	max-width:480px;
+	margin:0 auto 14px;
+	color:var(--parchment);
+	opacity:0.8;
+	font-size:13px;
+	font-style:italic;
+}
+
+.vaultGrid{
+	display:flex;
+	flex-wrap:wrap;
+	gap:16px;
+	justify-content:center;
+	margin-top:18px;
+}
+
+.vaultCard{
+	position:relative;
+	width:150px;
+	padding:10px;
+	background:linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+	border:1px solid var(--gold);
+	border-radius:4px;
+	box-shadow:0 4px 10px rgba(0,0,0,0.35);
+	color:var(--ink);
+	cursor:pointer;
+	transition:transform 0.15s ease;
+}
+
+.vaultCard:hover{
+	transform:translateY(-3px);
+}
+
+.vaultPortrait{
+	width:100%;
+	aspect-ratio:1;
+	border:1px solid var(--gold);
+	border-radius:3px;
+	background:rgba(0,0,0,0.12);
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	overflow:hidden;
+	font-size:12px;
+	font-variant:small-caps;
+	color:var(--blood-dark);
+	text-align:center;
+}
+
+.vaultPortrait img{
+	width:100%;
+	height:100%;
+	object-fit:cover;
+}
+
+.vaultCardName{
+	margin-top:6px;
+	font-variant:small-caps;
+	letter-spacing:0.5px;
+	font-weight:700;
+	font-size:14px;
+	overflow-wrap:break-word;
+}
+
+.vaultUploadBtn, .vaultDeleteBtn{
+	position:absolute;
+	width:22px;
+	height:22px;
+	padding:0;
+	border-radius:50%;
+	border:1px solid var(--gold);
+	font-size:12px;
+	line-height:1;
+	cursor:pointer;
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.vaultUploadBtn{
+	top:6px;
+	right:6px;
+}
+
+.vaultDeleteBtn{
+	bottom:6px;
+	right:6px;
+}
+
+.vaultUploadBtn:hover, .vaultDeleteBtn:hover{
+	filter:brightness(1.2);
+}
+
+
+
+.libraryScreen{
+	flex:1;
+	min-width:0;
+	max-width:1100px;
+	text-align:center;
+	color:var(--parchment);
+	padding:20px;
+}
+
+.libraryScreen h2{
+	font-variant:small-caps;
+	letter-spacing:1.5px;
+	color:var(--gold-light);
+	margin-bottom:14px;
+}
+
+.libraryGrid{
+	display:flex;
+	flex-wrap:wrap;
+	gap:16px;
+	justify-content:center;
+	align-items:flex-start;
+}
+
+.librarySection{
+	width:300px;
+	text-align:left;
+}
+
+.abilityLibrarySection{
+	width:100%;
+	max-width:720px;
+}
+
+.libraryAbilityColumns{
+	display:flex;
+	gap:14px;
+}
+
+.libraryAbilityColumn{
+	flex:1;
+	min-width:0;
+}
+
+.libraryAbilityColumn h4{
+	margin:0 0 8px;
+	text-align:center;
+	font-size:13px;
+	font-variant:small-caps;
+	letter-spacing:1px;
+	color:var(--gold-light);
+}
+
+.libraryList{
+	display:flex;
+	flex-direction:column;
+	gap:5px;
+	margin-bottom:10px;
+	max-height:160px;
+	overflow-y:auto;
+}
+
+.libraryListItem{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	gap:6px;
+	background:rgba(0,0,0,0.2);
+	border:1px solid rgba(var(--gold-rgb),0.4);
+	border-radius:3px;
+	padding:4px 8px;
+	font-size:13px;
+}
+
+.libraryListItem > span{
+	flex:1;
+	min-width:0;
+	overflow-wrap:break-word;
+}
+
+.libraryListItem .libraryDeleteBtn, .libraryListItem .libraryRenameBtn{
+	flex:0 0 auto;
+	width:20px;
+	height:20px;
+	padding:0;
+	border-radius:50%;
+	border:1px solid var(--gold);
+	font-size:11px;
+	line-height:1;
+	cursor:pointer;
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.libraryListItem .libraryRenameBtn{
+	background:var(--gold);
+	color:var(--ink);
+}
+
+.libraryListItem .libraryDeleteBtn:hover, .libraryListItem .libraryRenameBtn:hover{
+	filter:brightness(1.2);
+}
+
+.libraryEmpty{
+	font-size:13px;
+	font-style:italic;
+	opacity:0.7;
+	margin-bottom:10px;
+}
+
+.libraryForm{
+	display:flex;
+	flex-direction:column;
+	gap:6px;
+	border-top:1px solid rgba(var(--gold-rgb),0.4);
+	padding-top:10px;
+}
+
+.libraryForm input[type=text],
+.libraryForm select,
+.libraryForm textarea{
+	width:100%;
+	font-family:inherit;
+	font-size:13px;
+	padding:4px 6px;
+	border:1px solid var(--gold);
+	border-radius:3px;
+
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.libraryForm select option{
+	background:var(--blood-dark);
+	color:var(--parchment);
+}
+
+.libraryForm textarea{
+	min-height:44px;
+	resize:vertical;
+}
+
+.libraryCheckboxLabel{
+	display:flex;
+	align-items:center;
+	gap:6px;
+	color:var(--parchment);
+	font-size:13px;
+}
+
+.libraryCheckboxLabel input[type=checkbox]{
+	width:auto;
+}
+
+.librarySinsNote{
+	font-size:12px;
+	font-style:italic;
+	opacity:0.75;
+}
+
+.librarySinsTable{
+	width:100%;
+	border-collapse:collapse;
+	font-size:12px;
+}
+
+.librarySinsTable th{
+	font-variant:small-caps;
+	letter-spacing:0.5px;
+	color:var(--gold-light);
+	border-bottom:1px solid var(--gold);
+	padding:3px 4px;
+	text-align:left;
+}
+
+.librarySinsTable td{
+	padding:2px;
+	vertical-align:top;
+}
+
+.librarySinsTable td:first-child{
+	text-align:center;
+	width:10%;
+	color:var(--gold-light);
+	font-weight:700;
+}
+
+.librarySinsTable input[type=text]{
+	width:100%;
+	font-family:inherit;
+	font-size:12px;
+	padding:3px 4px;
+	border:1px solid var(--gold);
+	border-radius:3px;
+	background:var(--blood-dark);
+	color:var(--parchment);
 }
 
 .cardOverflowList{
@@ -767,6 +1285,12 @@ select{
 		order:1;
 	}
 
+	.vaultScreen, .libraryScreen{
+		order:1;
+		width:100%;
+		max-width:900px;
+	}
+
 	.cardPanel{
 		order:2;
 		width:100%;
@@ -783,9 +1307,7 @@ select{
 		margin-top:14px;
 	}
 
-	/* the desktop grouping is a purely vertical/visual arrangement - on
-	   mobile the buttons go back to being one flat wrapping row, so the
-	   group wrappers are removed from layout instead of nesting rows */
+
 	.bookmarkGroup{
 		display:contents;
 	}

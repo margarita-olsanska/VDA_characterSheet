@@ -5,7 +5,8 @@ import { getTraitValue, getTraitType } from "./traits.js"
 import { getState, STATES } from "./state.js"
 import { generationData } from "./generation.js"
 import { creationState } from "./creation.js"
-import { archetypes } from "./archetypes.js"
+import { archetypes } from "./VDA20data.js"
+import { t, localize } from "./i18n.js"
 
 function getMaxDots(type){
 
@@ -125,6 +126,13 @@ export function renderWillpower(){
 	})
 }
 
+export function renderHealth(){
+
+	document.querySelectorAll(".healthInput").forEach((input, i) => {
+		input.value = character.health[i] || ""
+	})
+}
+
 export function renderBlood(){
 
 	const checkboxes = document.querySelectorAll(".bloodPoints input")
@@ -145,31 +153,36 @@ export function renderBloodInfo(){
 	const gen = character.generation
 	const data = generationData[gen]
 
-	info.textContent = `Макс: ${data.bloodPool} | За ход: ${data.perTurn}`
+	info.textContent = t("blood.info", data.bloodPool, data.perTurn)
 }
 
 export function renderSheet(){
 
 	document.body.dataset.state = getState()
 
-	// XP only matters while spending XP (Прокачка), freebie only while spending freebie points
-	document.getElementById("xpLabel").style.display = getState() === STATES.EDIT ? "" : "none"
+	document.getElementById("xpLabel").style.display = (getState() === STATES.EDIT || getState() === STATES.VIEW) ? "" : "none"
 	document.getElementById("freebieLabel").style.display = getState() === STATES.FREEBIE ? "" : "none"
 
 	document.getElementById("characterName").value = character.name || ""
+	document.getElementById("conceptInput").value = character.concept || ""
 	document.getElementById("clanSelect").value = character.clan || ""
 	document.getElementById("natureSelect").value = character.nature || ""
 	document.getElementById("demeanorSelect").value = character.demeanor || ""
 	document.getElementById("sireNotes").value = character.sireNotes || ""
+	document.getElementById("clanFlawNotes").value = character.clanFlaw || ""
+	document.getElementById("notesText").value = character.notes || ""
 	document.getElementById("roadSelect").value = character.road.type || ""
 
-	document.getElementById("natureCardBody").innerHTML = character.nature
-		? `<strong>${archetypes[character.nature].name}</strong><p>${archetypes[character.nature].description}</p>`
-		: "Не выбрана"
+	const nature = character.nature && archetypes[character.nature]
+	const demeanor = character.demeanor && archetypes[character.demeanor]
 
-	document.getElementById("demeanorCardBody").innerHTML = character.demeanor
-		? `<strong>${archetypes[character.demeanor].name}</strong><p>${archetypes[character.demeanor].description}</p>`
-		: "Не выбрана"
+	document.getElementById("natureCardBody").innerHTML = nature
+		? `<strong>${localize(nature.name)}</strong><p>${localize(nature.description)}</p>`
+		: t("notSelected")
+
+	document.getElementById("demeanorCardBody").innerHTML = demeanor
+		? `<strong>${localize(demeanor.name)}</strong><p>${localize(demeanor.description)}</p>`
+		: t("notSelected")
 
 	document.querySelectorAll(".disciplineSelect").forEach(select => {
 
@@ -185,6 +198,10 @@ export function renderSheet(){
 		select.value = character.backgrounds[slot].type || ""
 	})
 
+	document.querySelectorAll(".virtueChoiceSelect").forEach(select => {
+		select.value = character.virtueChoices[select.dataset.virtue]
+	})
+
 	document.querySelectorAll(".dots").forEach(group => {
 
 		const trait = group.dataset.trait
@@ -195,20 +212,38 @@ export function renderSheet(){
 
 	renderCosts()
 	renderWillpower()
+	renderHealth()
 	renderBlood()
 	renderBloodInfo()
 
-	//bookmarks
+	const creationActive = character.creation.active
+	const freebieStepBtn = document.getElementById("btnFreebieStep")
+
+	freebieStepBtn.style.display = creationActive ? "" : "none"
+	freebieStepBtn.textContent = getState() === STATES.FREEBIE ? t("action.backToCreation") : t("action.toFreebie")
+
+	document.getElementById("btnFinishCreation").style.display = creationActive ? "" : "none"
+
+	document.getElementById("btnView").style.display = creationActive ? "none" : ""
+	document.getElementById("btnSaveCurrentCharacter").style.display = creationActive ? "none" : ""
+	document.getElementById("btnSaveHtml").style.display = creationActive ? "none" : ""
+
+	const editStepBtn = document.getElementById("btnEditStep")
+	editStepBtn.style.display = creationActive ? "none" : ""
+	editStepBtn.textContent = getState() === STATES.EDIT ? t("action.backToView") : t("action.toEdit")
+
 	document.querySelectorAll(".bookmark").forEach(btn => btn.classList.remove("active"))
 
 	const activeBtn = {
 		[STATES.CREATE]: "btnCreation",
-		[STATES.FREEBIE]: "btnFreebie",
-		[STATES.EDIT]: "btnEdit",
+		[STATES.FREEBIE]: "btnCreation",
+		[STATES.EDIT]: "btnView",
 		[STATES.VIEW]: "btnView"
 	}[getState()]
 
 	if(activeBtn) document.getElementById(activeBtn).classList.add("active")
+
+	document.getElementById("btnView").disabled = getState() === STATES.VIEW
 }
 
 export function renderResources(xpInput, freebieInput){
@@ -224,59 +259,14 @@ function isValidPriorityDistribution(pool){
 	return values.every((v, i) => v === targets[i])
 }
 
-export function renderCreation(){
+const creationInfoBoxIds = ["creationInfoAttributes", "creationInfoAbilities", "creationInfoAdvantages"]
 
-	const el = document.getElementById("creationInfo")
-
-	if(!el) return
-
-	if(getState() !== STATES.CREATE){
-		el.innerHTML = ""
-		return
-	}
-
-	const attr = creationState.attributes
-	const abil = creationState.abilities
-
-	const priorityTargets = pool => [pool.tertiary, pool.secondary, pool.primary].sort((a,b) => a - b).join("/")
-
-	const rows = [
-		{
-			label: "Атрибуты",
-			current: `${attr.assigned.physical}/${attr.assigned.social}/${attr.assigned.mental}`,
-			expected: priorityTargets(attr),
-			done: isValidPriorityDistribution(attr)
-		},
-		{
-			label: "Способности",
-			current: `${abil.assigned.talents}/${abil.assigned.skills}/${abil.assigned.knowledges}`,
-			expected: priorityTargets(abil),
-			done: isValidPriorityDistribution(abil)
-		},
-		{
-			label: "Дисциплины",
-			current: `${creationState.disciplines.used}`,
-			expected: `${creationState.disciplines.points}`,
-			done: creationState.disciplines.used === creationState.disciplines.points
-		},
-		{
-			label: "Биография",
-			current: `${creationState.backgrounds.used}`,
-			expected: `${creationState.backgrounds.points}`,
-			done: creationState.backgrounds.used === creationState.backgrounds.points
-		},
-		{
-			label: "Добродетели",
-			current: `${creationState.virtues.used}`,
-			expected: `${creationState.virtues.points}`,
-			done: creationState.virtues.used === creationState.virtues.points
-		}
-	]
+function renderCreationTable(el, rows){
 
 	el.innerHTML = `
 		<table class="creationTable">
 			<thead>
-				<tr><th></th><th>Текущее</th><th>Ожидаемое</th></tr>
+				<tr><th></th><th>${t("creation.current")}</th><th>${t("creation.expected")}</th></tr>
 			</thead>
 			<tbody>
 				${rows.map(row => `
@@ -289,4 +279,55 @@ export function renderCreation(){
 			</tbody>
 		</table>
 	`
+}
+
+export function renderCreation(){
+
+	if(getState() !== STATES.CREATE){
+		creationInfoBoxIds.forEach(id => {
+			const el = document.getElementById(id)
+			if(el) el.innerHTML = ""
+		})
+		return
+	}
+
+	const attr = creationState.attributes
+	const abil = creationState.abilities
+
+	const priorityTargets = pool => [pool.tertiary, pool.secondary, pool.primary].sort((a,b) => a - b).join("/")
+
+	renderCreationTable(document.getElementById("creationInfoAttributes"), [{
+		label: t("creation.attributes"),
+		current: `${attr.assigned.physical}/${attr.assigned.social}/${attr.assigned.mental}`,
+		expected: priorityTargets(attr),
+		done: isValidPriorityDistribution(attr)
+	}])
+
+	renderCreationTable(document.getElementById("creationInfoAbilities"), [{
+		label: t("creation.abilities"),
+		current: `${abil.assigned.talents}/${abil.assigned.skills}/${abil.assigned.knowledges}`,
+		expected: priorityTargets(abil),
+		done: isValidPriorityDistribution(abil)
+	}])
+
+	renderCreationTable(document.getElementById("creationInfoAdvantages"), [
+		{
+			label: t("creation.disciplines"),
+			current: `${creationState.disciplines.used}`,
+			expected: `${creationState.disciplines.points}`,
+			done: creationState.disciplines.used === creationState.disciplines.points
+		},
+		{
+			label: t("creation.backgrounds"),
+			current: `${creationState.backgrounds.used}`,
+			expected: `${creationState.backgrounds.points}`,
+			done: creationState.backgrounds.used === creationState.backgrounds.points
+		},
+		{
+			label: t("creation.virtues"),
+			current: `${creationState.virtues.used}`,
+			expected: `${creationState.virtues.points}`,
+			done: creationState.virtues.used === creationState.virtues.points
+		}
+	])
 }

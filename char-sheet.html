@@ -2,87 +2,83 @@
 <html lang="ru">
 	<head>
 		<meta charset="UTF-8">
-			<title>VTM Dark Ages Sheet</title>
+			<title>VTM Character Sheet</title>
 		<link rel="stylesheet" href="style.css">
 	</head>
 	<body>
+		<div class="langSwitch">
+			<button type="button" id="btnLangEn" class="langBtn">EN</button>
+			<button type="button" id="btnLangRu" class="langBtn">RU</button>
+		</div>
+
 		<div class="book">
 
 			<nav class="bookmarks">
 
 				<div class="bookmarkGroup">
-					<button id="btnCreation" class="bookmark">Создание</button>
-					<button id="btnFreebie" class="bookmark">Свободные очки</button>
+					<button id="btnVault" class="bookmark" data-i18n="tab.vault">Хранилище</button>
+					<button id="btnLibrary" class="bookmark" data-i18n="tab.library">Библиотека</button>
 				</div>
 
 				<div class="bookmarkGroup">
-					<button id="btnEdit" class="bookmark">Прокачка</button>
+					<button id="btnCreation" class="bookmark" data-i18n="tab.creation">Создание персонажа</button>
+					<button id="btnFreebieStep" class="bookmark action" data-i18n="action.toFreebie">Далее: свободные очки</button>
+					<button id="btnFinishCreation" class="bookmark action" data-i18n="action.finishCreation">Завершить создание</button>
 				</div>
 
 				<div class="bookmarkGroup">
-					<button id="btnView" class="bookmark">Просмотр</button>
-					<button id="btnSaveHtml" class="bookmark action">Сохранить лист (.html)</button>
-				</div>
-
-				<div class="bookmarkGroup">
-					<button id="btnSaveJson" class="bookmark action">Экспорт персонажа</button>
-					<button id="btnLoadJson" class="bookmark action">Импорт персонажа</button>
-					<input type="file" id="loadFileInput" accept="application/json" style="display:none">
-				</div>
-
-				<div class="bookmarkGroup">
-					<button id="btnSaveLibrary" class="bookmark action">Экспорт библиотеки</button>
-					<button id="btnLoadLibrary" class="bookmark action">Импорт библиотеки</button>
-					<input type="file" id="loadLibraryInput" accept="application/json" style="display:none">
+					<button id="btnView" class="bookmark" data-i18n="tab.view">Персонаж</button>
+					<button id="btnEditStep" class="bookmark action" data-i18n="action.toEdit">Прокачка</button>
+					<button id="btnSaveCurrentCharacter" class="bookmark action" data-i18n="vault.saveCurrent">Сохранить персонажа</button>
+					<button id="btnSaveHtml" class="bookmark action" data-i18n="action.saveHtml">Экспортировать лист персонажа (.html)</button>
 				</div>
 
 			</nav>
 
 			<div class="sheet">
-			<h1>VAMPIRE: THE DARK AGES</h1>
+			<h1 id="sheetTitle">VAMPIRE: THE DARK AGES</h1>
 
 			<div class="resources">
 				<label id="xpLabel">
-				ОЧКИ ОПЫТА
+				<span data-i18n="label.xp">ОЧКИ ОПЫТА</span>
 				<input type="number" id="xpInput">
 				</label>
 
 				<label id="freebieLabel">
-				СВОБОДНЫЕ ОЧКИ
+				<span data-i18n="label.freebie">СВОБОДНЫЕ ОЧКИ</span>
 				<input type="number" id="freebieInput">
 				</label>
-
-				<div id="creationInfo"></div>
 			</div>
 
 			<section class="top">
 				<div>
-					<label>Имя</label>
+					<label data-i18n="label.name">Имя</label>
 					<input type="text" id="characterName">
 
-					<label>Игрок</label>
+					<label data-i18n="label.player">Игрок</label>
 					<input type="text">
 
-					<label>Хроника</label>
+					<label data-i18n="label.chronicle">Хроника</label>
 					<input type="text">
 				</div>
 
 				<div>
-					<label>Натура</label>
+					<label data-i18n="label.nature">Натура</label>
 					<select id="natureSelect"></select>
 
-					<label>Маска</label>
+					<label data-i18n="label.demeanor">Маска</label>
 					<select id="demeanorSelect"></select>
 
-					<label>Амплуа</label>
-					<input type="text">
+					<label data-i18n="label.concept">Амплуа</label>
+					<input type="text" id="conceptInput" list="conceptOptions">
+					<datalist id="conceptOptions"></datalist>
 				</div>
 
 				<div>
-					<label>Клан</label>
+					<label data-i18n="label.clan">Клан</label>
 					<select id="clanSelect"></select>
-					
-					<label>Поколение</label>
+
+					<label data-i18n="label.generation">Поколение</label>
 					<select id="generationSelect">
 						<option value="4">4</option>
 						<option value="5">5</option>
@@ -96,220 +92,60 @@
 						<option value="13">13</option>
 					</select>
 
-					<label>Сир</label>
+					<label data-i18n="label.sire">Сир</label>
 					<input type="text">
 				</div>
 			</section>
 
-<!------------------------------------------------------------------------------------>
 
-			<h2>Характеристики</h2>
+			<h2 data-i18n="heading.attributes">Характеристики</h2>
+			<div id="creationInfoAttributes"></div>
 			<div class="columns">
-				<div>
-					<h3>Физические</h3>
-					<div class="attribute">
-						Сила
-						<div class="dots" data-trait="strength"></div>
-					</div>
-					<div class="attribute">
-						Ловкость
-						<div class="dots" data-trait="dexterity"></div>
-					</div>
-					<div class="attribute">
-						Выносливость
-						<div class="dots" data-trait="stamina"></div>
-					</div>
+				<div id="physicalColumn" data-category="physical">
+					<h3 data-i18n="category.physical">Физические</h3>
 				</div>
-				<div>
-					<h3>Социальные</h3>
-
-					<div class="attribute">
-						Обаяние
-						<div class="dots" data-trait="charisma"></div>
-					</div>
-					<div class="attribute">
-						Манипуляция
-						<div class="dots" data-trait="manipulation"></div>
-					</div>
-					<div class="attribute">
-						Привлекательность
-						<div class="dots" data-trait="composure"></div>
-					</div>
+				<div id="socialColumn" data-category="social">
+					<h3 data-i18n="category.social">Социальные</h3>
 				</div>
-				<div>
-					<h3>Ментальные</h3>
-					<div class="attribute">
-						Восприятие
-						<div class="dots" data-trait="wits"></div>
-					</div>
-					<div class="attribute">
-						Интеллект
-						<div class="dots" data-trait="intelligence"></div>
-					</div>
-					<div class="attribute">
-						Смекалка
-						<div class="dots" data-trait="resolve"></div>
-					</div>
+				<div id="mentalColumn" data-category="mental">
+					<h3 data-i18n="category.mental">Ментальные</h3>
 				</div>
 			</div>
 
-<!------------------------------------------------------------------------------------>
 
-			<h2>Способности</h2>
+			<h2 data-i18n="heading.abilities">Способности</h2>
+			<div id="creationInfoAbilities"></div>
 			<div class="columns">
 				<div id="talentsColumn" data-category="talents">
-					<h3>Таланты</h3>
-					<div class="ability">
-						Атлетика
-						<div class="dots" data-trait="athletics"></div>
-					</div>
-					<div class="ability">
-						Бдительность
-						<div class="dots" data-trait="alertness"></div>
-					</div>
-					<div class="ability">
-						Драка
-						<div class="dots" data-trait="brawl"></div>
-					</div>
-					<div class="ability">
-						Запугивание
-						<div class="dots" data-trait="intimidation"></div>
-					</div>
-					<div class="ability">
-						Красноречие
-						<div class="dots" data-trait="expression"></div>
-					</div>
-					<div class="ability">
-						Лидерство
-						<div class="dots" data-trait="leadership"></div>
-					</div>
-					<div class="ability">
-						Ловкость рук
-						<div class="dots" data-trait="legerdemain"></div>
-					</div>
-					<div class="ability">
-						Хитрость
-						<div class="dots" data-trait="subterfuge"></div>
-					</div>
-					<div class="ability">
-						Шестое чувство
-						<div class="dots" data-trait="awareness"></div>
-					</div>
-					<div class="ability">
-						Эмпатия
-						<div class="dots" data-trait="empathy"></div>
-					</div>
-
+					<h3 data-i18n="category.talents">Таланты</h3>
 					<div class="addAbility" data-category="talents">
-						<input type="text" class="addAbilityInput" placeholder="Новая способность">
+						<input type="text" class="addAbilityInput" placeholder="Новая способность" data-i18n-placeholder="placeholder.newAbility">
 						<button type="button" class="addAbilityBtn">+</button>
 					</div>
 				</div>
 				<div id="skillsColumn" data-category="skills">
-					<h3>Навыки</h3>
-					<div class="ability">
-						Стрельба из лука
-						<div class="dots" data-trait="archery"></div>
-					</div>
-					<div class="ability">
-						Коммерция
-						<div class="dots" data-trait="commerce"></div>
-					</div>
-					<div class="ability">
-						Выживание
-						<div class="dots" data-trait="survival"></div>
-					</div>
-					<div class="ability">
-						Исполнение
-						<div class="dots" data-trait="performance"></div>
-					</div>
-					<div class="ability">
-						Верховая езда
-						<div class="dots" data-trait="ride"></div>
-					</div>
-					<div class="ability">
-						Обр. с животными
-						<div class="dots" data-trait="animalKen"></div>
-					</div>
-					<div class="ability">
-						Ремесло
-						<div class="dots" data-trait="crafts"></div>
-					</div>
-					<div class="ability">
-						Скрытность
-						<div class="dots" data-trait="stealth"></div>
-					</div>
-					<div class="ability">
-						Фехтование
-						<div class="dots" data-trait="melee"></div>
-					</div>
-					<div class="ability">
-						Этикет
-						<div class="dots" data-trait="etiquette"></div>
-					</div>
-
+					<h3 data-i18n="category.skills">Навыки</h3>
 					<div class="addAbility" data-category="skills">
-						<input type="text" class="addAbilityInput" placeholder="Новая способность">
+						<input type="text" class="addAbilityInput" placeholder="Новая способность" data-i18n-placeholder="placeholder.newAbility">
 						<button type="button" class="addAbilityBtn">+</button>
 					</div>
 				</div>
 
 				<div id="knowledgesColumn" data-category="knowledges">
-					<h3>Знания</h3>
-					<div class="ability">
-						Гум. науки
-						<div class="dots" data-trait="academics"></div>
-					</div>
-					<div class="ability">
-						Законы
-						<div class="dots" data-trait="law"></div>
-					</div>
-					<div class="ability">
-						Медицина
-						<div class="dots" data-trait="medicine"></div>
-					</div>
-					<div class="ability">
-						Оккультизм
-						<div class="dots" data-trait="occult"></div>
-					</div>
-					<div class="ability">
-						Политика
-						<div class="dots" data-trait="politics"></div>
-					</div>
-					<div class="ability">
-						Расследование
-						<div class="dots" data-trait="investigation"></div>
-					</div>
-					<div class="ability">
-						Головоломки
-						<div class="dots" data-trait="enigmas"></div>
-					</div>
-					<div class="ability">
-						Житейская мудрость
-						<div class="dots" data-trait="hearthWisdom"></div>
-					</div>
-					<div class="ability">
-						Распорядительство
-						<div class="dots" data-trait="seneschal"></div>
-					</div>
-					<div class="ability">
-						Теология
-						<div class="dots" data-trait="theology"></div>
-					</div>
-
+					<h3 data-i18n="category.knowledges">Знания</h3>
 					<div class="addAbility" data-category="knowledges">
-						<input type="text" class="addAbilityInput" placeholder="Новая способность">
+						<input type="text" class="addAbilityInput" placeholder="Новая способность" data-i18n-placeholder="placeholder.newAbility">
 						<button type="button" class="addAbilityBtn">+</button>
 					</div>
 				</div>
 			</div>
 
-<!------------------------------------------------------------------------------------>
 
-			<h2>Преимущества</h2>
+			<h2 data-i18n="heading.advantages">Преимущества</h2>
+			<div id="creationInfoAdvantages"></div>
 			<div class="columns">
 				<div id="disciplinesColumn">
-					<h3>Дисциплины</h3>
+					<h3 data-i18n="heading.disciplines">Дисциплины</h3>
 
 					<div class="discipline">
 						<select data-slot="slot1" class="disciplineSelect"></select>
@@ -326,10 +162,10 @@
 						<div class="dots" data-trait="slot3"></div>
 					</div>
 
-					<button type="button" id="addDisciplineBtn" class="addSlotBtn">+ Добавить дисциплину</button>
+					<button type="button" id="addDisciplineBtn" class="addSlotBtn" data-i18n="action.addDiscipline">+ Добавить дисциплину</button>
 				</div>
 				<div id="backgroundsColumn">
-					<h3>Факты Биографии</h3>
+					<h3 data-i18n="heading.backgrounds">Факты Биографии</h3>
 
 					<div class="background">
 						<select class="backgroundSelect" data-slot="background1"></select>
@@ -352,28 +188,34 @@
 						<div class="dots" data-trait="background5"></div>
 					</div>
 
-					<button type="button" id="addBackgroundBtn" class="addSlotBtn">+ Добавить факт биографии</button>
+					<button type="button" id="addBackgroundBtn" class="addSlotBtn" data-i18n="action.addBackground">+ Добавить факт биографии</button>
 				</div>
 
 				<div>
-					<h3>Добродетели</h3>
+					<h3 data-i18n="heading.virtues">Добродетели</h3>
 					<div class="virtue">
-						Совесть/Решимость
+						<select class="virtueChoiceSelect" data-virtue="virtue1">
+							<option value="conscience" data-i18n="virtue.conscience">Совесть</option>
+							<option value="conviction" data-i18n="virtue.conviction">Решимость</option>
+						</select>
 						<div class="dots" data-trait="virtue1"></div>
 					</div>
 					<div class="virtue">
-						Самоконтроль/Инстинкт
+						<select class="virtueChoiceSelect" data-virtue="virtue2">
+							<option value="selfControl" data-i18n="virtue.selfControl">Самоконтроль</option>
+							<option value="instinct" data-i18n="virtue.instinct">Инстинкт</option>
+						</select>
 						<div class="dots" data-trait="virtue2"></div>
 					</div>
 					<div class="virtue">
-						Смелость
+						<span data-i18n="virtue.virtue3">Смелость</span>
 						<div class="dots" data-trait="virtue3"></div>
 					</div>
 				</div>
 			</div>
 			<div class="columns">
 				<div>
-					<h3>Запас крови</h3>
+					<h3 data-i18n="heading.bloodPool">Запас крови</h3>
 					<div id="bloodInfo"></div>
 					<div class="bloodPoints">
 						<input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox"><input type="checkbox">
@@ -387,10 +229,10 @@
 					</div>
 				</div>
 				<div>
-					<h3>Дорога</h3>
+					<h3 data-i18n="heading.road">Дорога</h3>
 					<select id="roadSelect"></select>
 					<div class="dots" data-trait="road"></div>
-					<h3>Воля</h3>
+					<h3 data-i18n="heading.willpower">Воля</h3>
 					<div class="dots" data-trait="willpower"></div>
 					<div class="willpowerCurrent">
 						<input type="checkbox">
@@ -407,15 +249,15 @@
 				</div>
 
 				<div>
-					<h3>Здоровье</h3>
+					<h3 data-i18n="heading.health">Здоровье</h3>
 					<div class="healthPoints">
-						<label>Задет <input type="checkbox"></label>
-						<label>Поврежден <input type="checkbox"></label>
-						<label>Ранен <input type="checkbox"></label>
-						<label>Тяжело ранен <input type="checkbox"></label>
-						<label>Травмирован <input type="checkbox"></label>
-						<label>Искалечен <input type="checkbox"></label>
-						<label>Обездвижен <input type="checkbox"></label>
+						<label><span data-i18n="health.bruised">Помят</span><span class="healthPenalty"></span><input type="text" class="healthInput" maxlength="1"></label>
+						<label><span data-i18n="health.hurt">Легко ранен</span><span class="healthPenalty">-1</span><input type="text" class="healthInput" maxlength="1"></label>
+						<label><span data-i18n="health.injured">Ранен</span><span class="healthPenalty">-1</span><input type="text" class="healthInput" maxlength="1"></label>
+						<label><span data-i18n="health.wounded">Серьёзно ранен</span><span class="healthPenalty">-2</span><input type="text" class="healthInput" maxlength="1"></label>
+						<label><span data-i18n="health.mauled">Тяжело ранен</span><span class="healthPenalty">-2</span><input type="text" class="healthInput" maxlength="1"></label>
+						<label><span data-i18n="health.crippled">Едва жив</span><span class="healthPenalty">-5</span><input type="text" class="healthInput" maxlength="1"></label>
+						<label><span data-i18n="health.incapacitated">При смерти</span><span class="healthPenalty"></span><input type="text" class="healthInput" maxlength="1"></label>
 					</div>
 				</div>
 			</div>
@@ -423,55 +265,305 @@
 
 			<aside class="cardPanel">
 
-				<div class="card">
-					<h4>Натура</h4>
-					<div class="cardBody" id="natureCardBody">Не выбрана</div>
+				<div class="card portraitCard">
+					<div class="portraitBox" id="portraitBox" title="Загрузить портрет" data-i18n-title="vault.uploadPortrait">
+						<img id="portraitImg" style="display:none">
+						<span id="portraitPlaceholder" data-i18n="portrait.upload">+ Портрет</span>
+					</div>
+					<input type="file" id="portraitInput" accept="image/*" style="display:none">
 				</div>
 
 				<div class="card">
-					<h4>Маска</h4>
-					<div class="cardBody" id="demeanorCardBody">Не выбрана</div>
+					<h4 data-i18n="card.clanFlaw">Клановый изъян</h4>
+					<textarea id="clanFlawNotes" maxlength="500" placeholder="Изъян клана персонажа..." data-i18n-placeholder="placeholder.clanFlaw"></textarea>
 				</div>
 
 				<div class="card">
-					<h4>Сир</h4>
-					<textarea id="sireNotes" maxlength="500" placeholder="Что известно о сире персонажа..."></textarea>
+					<h4 data-i18n="card.nature">Натура</h4>
+					<div class="cardBody" id="natureCardBody" data-i18n="notSelected">Не выбрана</div>
+				</div>
+
+				<div class="card">
+					<h4 data-i18n="card.demeanor">Маска</h4>
+					<div class="cardBody" id="demeanorCardBody" data-i18n="notSelected">Не выбрана</div>
+				</div>
+
+				<div class="card">
+					<h4 data-i18n="card.sire">Сир</h4>
+					<textarea id="sireNotes" maxlength="500" placeholder="Что известно о сире персонажа..." data-i18n-placeholder="placeholder.sireNotes"></textarea>
+				</div>
+
+				<div class="card">
+					<h4 data-i18n="card.notes">Заметки</h4>
+					<textarea id="notesText" maxlength="2000" placeholder="Заметки о персонаже..." data-i18n-placeholder="placeholder.notes"></textarea>
 				</div>
 
 				<div class="cardSection">
-					<h3>Дисциплины</h3>
+					<h3 data-i18n="cardSection.disciplines">Дисциплины</h3>
 					<div class="cardList" id="disciplineCardList"></div>
-					<button type="button" id="addDisciplineCardBtn" class="addSlotBtn">+ Добавить карточку дисциплины</button>
+					<button type="button" id="addDisciplineCardBtn" class="addSlotBtn" data-i18n="action.addDisciplineCard">+ Добавить карточку дисциплины</button>
 				</div>
 
 				<div class="cardSection" id="biographySidebarSection">
-					<h3>Факты биографии</h3>
+					<h3 data-i18n="cardSection.backgrounds">Факты биографии</h3>
 					<div class="cardList" id="biographyCardList"></div>
 				</div>
 
+				<div class="cardSection" id="pathCardSection" style="display:none">
+					<h3 data-i18n="cardSection.paths">Пути</h3>
+					<div class="cardList" id="pathCardList"></div>
+					<button type="button" id="addPathCardBtn" class="addSlotBtn" data-i18n="action.addPathCard">+ Добавить карточку пути</button>
+				</div>
+
+				<div class="cardSection" id="ritualCardSection" style="display:none">
+					<h3 data-i18n="cardSection.rituals">Ритуалы</h3>
+					<div class="cardList" id="ritualCardList"></div>
+					<button type="button" id="addRitualCardBtn" class="addSlotBtn" data-i18n="action.addRitualCard">+ Добавить карточку ритуала</button>
+				</div>
+
 			</aside>
+
+			<div class="vaultScreen" id="vaultScreen" style="display:none">
+
+				<h2 data-i18n="vault.heading">Хранилище персонажей</h2>
+
+				<div class="vaultCharacterActions">
+					<button type="button" id="btnExportCharacter" class="addSlotBtn" data-i18n="action.exportCharacter">Экспортировать персонажа</button>
+					<button type="button" id="btnImportCharacter" class="addSlotBtn" data-i18n="action.importCharacter">Импортировать персонажа</button>
+					<input type="file" id="loadFileInput" accept="application/json" style="display:none">
+				</div>
+
+				<div id="vaultBackendNote" class="vaultBackendNote" style="display:none"></div>
+
+				<div id="vaultConnectPrompt">
+					<button type="button" id="btnVaultConnect" class="addSlotBtn" data-i18n="vault.connect">Открыть папку персонажей</button>
+				</div>
+
+				<div id="vaultControls" style="display:none">
+					<div class="vaultGrid" id="vaultGrid"></div>
+				</div>
+
+			</div>
+
+			<div class="libraryScreen" id="libraryScreen" style="display:none">
+
+				<h2 data-i18n="library.heading">Библиотека</h2>
+
+				<div class="libraryPresetBar">
+					<label for="libraryPresetSelect" data-i18n="library.presetLabel">Библиотека:</label>
+					<select id="libraryPresetSelect"></select>
+					<button type="button" id="btnSavePreset" class="addSlotBtn" data-i18n="library.saveAsPreset">Сохранить как новую библиотеку</button>
+					<button type="button" id="btnResetPreset" class="addSlotBtn" data-i18n="library.resetToDefault">Сбросить к стандартным</button>
+					<button type="button" id="btnDeletePreset" class="addSlotBtn" data-i18n="library.deletePreset">Удалить библиотеку</button>
+				</div>
+
+				<div class="libraryFileActions">
+					<button type="button" id="btnSaveLibrary" class="addSlotBtn" data-i18n="action.exportLibrary">Экспортировать библиотеку</button>
+					<button type="button" id="btnLoadLibrary" class="addSlotBtn" data-i18n="action.importLibrary">Импортировать библиотеку</button>
+					<input type="file" id="loadLibraryInput" accept="application/json" style="display:none">
+				</div>
+
+				<div class="libraryGrid">
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="library.attributes">Характеристики</h3>
+						<div class="libraryList" id="libraryAttributeList"></div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="library.archetypes">Архетипы (натуры/маски)</h3>
+						<div class="libraryList" id="libraryArchetypeList"></div>
+						<div class="libraryForm">
+							<input type="text" id="libArchetypeName" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+							<textarea id="libArchetypeDesc" placeholder="Описание" data-i18n-placeholder="library.descPlaceholder"></textarea>
+							<button type="button" id="libArchetypeAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="library.clans">Кланы</h3>
+						<div class="libraryList" id="libraryClanList"></div>
+						<div class="libraryForm">
+							<input type="text" id="libClanName" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+							<select id="libClanDiscipline1"></select>
+							<select id="libClanDiscipline2"></select>
+							<select id="libClanDiscipline3"></select>
+							<button type="button" id="libClanAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="heading.disciplines">Дисциплины</h3>
+						<div class="libraryList" id="libraryDisciplineList"></div>
+						<div class="libraryForm">
+							<input type="text" id="libDisciplineName" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+							<label class="libraryCheckboxLabel">
+								<input type="checkbox" id="libDisciplineRitualPaths">
+								<span data-i18n="ritualPath.checkboxLabel">Имеет Ритуалы и Пути</span>
+							</label>
+							<button type="button" id="libDisciplineAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="heading.backgrounds">Факты биографии</h3>
+						<div class="libraryList" id="libraryBackgroundList"></div>
+						<div class="libraryForm">
+							<input type="text" id="libBackgroundName" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+							<textarea id="libBackgroundLevel1" placeholder="Уровень 1" data-i18n-placeholder="library.level1"></textarea>
+							<textarea id="libBackgroundLevel2" placeholder="Уровень 2" data-i18n-placeholder="library.level2"></textarea>
+							<textarea id="libBackgroundLevel3" placeholder="Уровень 3" data-i18n-placeholder="library.level3"></textarea>
+							<textarea id="libBackgroundLevel4" placeholder="Уровень 4" data-i18n-placeholder="library.level4"></textarea>
+							<textarea id="libBackgroundLevel5" placeholder="Уровень 5" data-i18n-placeholder="library.level5"></textarea>
+							<button type="button" id="libBackgroundAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="heading.road">Дороги</h3>
+						<div class="libraryList" id="libraryRoadList"></div>
+						<div class="libraryForm">
+							<input type="text" id="libRoadName" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+							<select id="libRoadParent"></select>
+							<div class="librarySinsNote" id="libRoadSinsNote" data-i18n="library.sinsOptional">Таблица грехов необязательна - можно оставить пустой.</div>
+							<table class="librarySinsTable">
+								<thead><tr><th data-i18n="sins.value">Значение</th><th data-i18n="sins.sin">Грех</th><th data-i18n="sins.rationale">Обоснование</th></tr></thead>
+								<tbody id="libRoadSinsBody"></tbody>
+							</table>
+							<button type="button" id="libRoadAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="library.powers">Силы дисциплин</h3>
+						<div class="libraryList" id="libraryPowerList"></div>
+						<div class="libraryForm">
+							<select id="libPowerDiscipline"></select>
+							<select id="libPowerLevel">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+							<input type="text" id="libPowerName" placeholder="Название силы" data-i18n-placeholder="power.namePlaceholder">
+							<textarea id="libPowerDesc" placeholder="Описание силы..." data-i18n-placeholder="power.descPlaceholder"></textarea>
+							<textarea id="libPowerRules" placeholder="Правила силы..." data-i18n-placeholder="power.rulesPlaceholder"></textarea>
+							<button type="button" id="libPowerAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="library.rituals">Ритуалы</h3>
+						<div class="libraryList" id="libraryRitualList"></div>
+						<div class="libraryForm">
+							<select id="libRitualDiscipline"></select>
+							<select id="libRitualLevel">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+							<input type="text" id="libRitualName" placeholder="Название ритуала" data-i18n-placeholder="ritual.namePlaceholder">
+							<textarea id="libRitualDesc" placeholder="Описание ритуала..." data-i18n-placeholder="ritual.descPlaceholder"></textarea>
+							<textarea id="libRitualRules" placeholder="Правила ритуала..." data-i18n-placeholder="ritual.rulesPlaceholder"></textarea>
+							<button type="button" id="libRitualAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection">
+						<h3 data-i18n="library.paths">Пути дисциплин</h3>
+						<div class="libraryList" id="libraryPathList"></div>
+						<div class="libraryForm">
+							<select id="libPathDiscipline"></select>
+							<select id="libPathLevel">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+							</select>
+							<input type="text" id="libPathName" placeholder="Название пути" data-i18n-placeholder="path.namePlaceholder">
+							<button type="button" id="libPathAdd" class="addSlotBtn" data-i18n="library.add">+ Добавить</button>
+						</div>
+					</div>
+
+					<div class="cardSection librarySection abilityLibrarySection">
+						<h3 data-i18n="library.abilities">Способности</h3>
+						<div class="libraryAbilityColumns">
+							<div class="libraryAbilityColumn">
+								<h4 data-i18n="category.talents">Таланты</h4>
+								<div class="libraryList" data-ability-category="talents"></div>
+								<div class="libraryForm">
+									<input type="text" class="libAbilityNameInput" data-category="talents" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+									<button type="button" class="libAbilityAddBtn addSlotBtn" data-category="talents" data-i18n="library.add">+ Добавить</button>
+								</div>
+							</div>
+							<div class="libraryAbilityColumn">
+								<h4 data-i18n="category.skills">Навыки</h4>
+								<div class="libraryList" data-ability-category="skills"></div>
+								<div class="libraryForm">
+									<input type="text" class="libAbilityNameInput" data-category="skills" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+									<button type="button" class="libAbilityAddBtn addSlotBtn" data-category="skills" data-i18n="library.add">+ Добавить</button>
+								</div>
+							</div>
+							<div class="libraryAbilityColumn">
+								<h4 data-i18n="category.knowledges">Знания</h4>
+								<div class="libraryList" data-ability-category="knowledges"></div>
+								<div class="libraryForm">
+									<input type="text" class="libAbilityNameInput" data-category="knowledges" placeholder="Название" data-i18n-placeholder="library.namePlaceholder">
+									<button type="button" class="libAbilityAddBtn addSlotBtn" data-category="knowledges" data-i18n="library.add">+ Добавить</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
 
 		</div>
 
 		<div class="cardOverflow" id="cardOverflow">
 
 			<div class="cardSection" id="disciplineOverflowSection">
-				<h3>Дисциплины</h3>
+				<h3 data-i18n="cardSection.disciplines">Дисциплины</h3>
 				<div class="cardOverflowList" id="disciplineOverflowList"></div>
 			</div>
 
 			<div class="cardSection" id="biographyOverflowSection">
-				<h3>Факты биографии</h3>
+				<h3 data-i18n="cardSection.backgrounds">Факты биографии</h3>
 				<div class="cardOverflowList" id="biographyOverflowList"></div>
+			</div>
+
+			<div class="cardSection" id="pathOverflowSection">
+				<h3 data-i18n="cardSection.paths">Пути</h3>
+				<div class="cardOverflowList" id="pathOverflowList"></div>
+			</div>
+
+			<div class="cardSection" id="ritualOverflowSection">
+				<h3 data-i18n="cardSection.rituals">Ритуалы</h3>
+				<div class="cardOverflowList" id="ritualOverflowList"></div>
 			</div>
 
 		</div>
 
 		<div class="cardSection sinsSection" id="sinsSection">
-			<h3 id="sinsTitle">Грехи</h3>
+			<h3 id="sinsTitle" data-i18n="sins.heading">Грехи</h3>
 			<table class="sinsTable">
 				<thead>
-					<tr><th>Значение</th><th>Грех</th><th>Обоснование</th></tr>
+					<tr><th data-i18n="sins.value">Значение</th><th data-i18n="sins.sin">Грех</th><th data-i18n="sins.rationale">Обоснование</th></tr>
 				</thead>
 				<tbody id="sinsTableBody"></tbody>
 			</table>

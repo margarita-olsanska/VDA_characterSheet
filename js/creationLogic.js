@@ -2,28 +2,20 @@ import { character } from "./character.js"
 import { creationState } from "./creation.js"
 import { getTraitType, setTraitValue, getTraitValue, getTraitMin } from "./traits.js"
 import { attributeCategories, abilityCategories, getCategory } from "./categories.js"
+import { t } from "./i18n.js"
 
 function getPoolTotal(pool){
 	return pool.points ?? (pool.primary + pool.secondary + pool.tertiary)
 }
 
-// creationState.*.used/assigned normally track point-buy spending as deltas
-// while createXP runs - but if the character already has values set from
-// outside creation mode (loaded from a save, or bought later in Freebie/
-// Edit), those never went through createXP, so the tracker would still read
-// 0 used even though the dots are actually filled in. Recomputing it from
-// the character's real current values whenever creation mode is shown keeps
-// it honest no matter how those values got there.
 export function syncCreationState(){
 
-	// attributes: the first dot is free, only points spent above that count
 	for(const category in attributeCategories){
 		creationState.attributes.assigned[category] = attributeCategories[category]
 			.reduce((sum, trait) => sum + (character.attributes[trait] - getTraitMin("attributes")), 0)
 	}
 	creationState.attributes.used = Object.values(creationState.attributes.assigned).reduce((a, b) => a + b, 0)
 
-	// abilities: built-ins plus any custom ones, grouped the same way
 	for(const category in abilityCategories){
 		creationState.abilities.assigned[category] = abilityCategories[category]
 			.reduce((sum, trait) => sum + character.abilities[trait], 0)
@@ -53,7 +45,6 @@ export function createXP(trait, clickedLevel){
 
 	if(!type) return
 
-	// disciplines without names, backgrounds without a picked type are ignored
 	if(type === "disciplines" && !character.disciplines[trait]?.name){
 		return
 	}
@@ -62,7 +53,6 @@ export function createXP(trait, clickedLevel){
 		return
 	}
 
-	// clicking the currently topmost filled dot removes it
 	if(clickedLevel === current) clickedLevel = Math.max(current - 1, getTraitMin(type))
 
 	let pool
@@ -100,7 +90,7 @@ export function createXP(trait, clickedLevel){
 	const delta = clickedLevel - current
 
 	if(delta > 0 && pool.used + delta > getPoolTotal(pool)){
-		alert("Нет доступных очков")
+		alert(t("alert.noPointsAvailable"))
 		return
 	}
 

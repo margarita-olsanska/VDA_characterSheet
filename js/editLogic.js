@@ -2,6 +2,7 @@ import { character } from "./character.js"
 import { costs } from "./costs.js"
 import { getTraitValue, setTraitValue, getTraitType, getTraitMin } from "./traits.js"
 import { generationData } from "./generation.js"
+import { t } from "./i18n.js"
 
 export function updateXP(trait, clickedLevel){
 
@@ -15,7 +16,6 @@ export function updateXP(trait, clickedLevel){
 
 	if(clickedLevel > maxTrait) return
 
-	// disciplines without names, backgrounds without a picked type are ignored
 	if(type === "disciplines" && !character.disciplines[trait]?.name){
 		return
 	}
@@ -24,10 +24,8 @@ export function updateXP(trait, clickedLevel){
 		return
 	}
 
-	// clicking the currently topmost filled dot removes it
 	if(clickedLevel === currentLevel) clickedLevel = Math.max(currentLevel - 1, getTraitMin(type))
 
-	// dots increment
 	if(clickedLevel > currentLevel){
 
 		let totalCost = 0
@@ -37,7 +35,7 @@ export function updateXP(trait, clickedLevel){
 		}
 
 		if(character.xp < totalCost){
-			alert("Недостаточно опыта")
+			alert(t("alert.notEnoughXp"))
 			return
 		}
 
@@ -46,7 +44,6 @@ export function updateXP(trait, clickedLevel){
 		return
 	}
 
-	// dots decrement
 	if(clickedLevel < currentLevel){
 
 		let refund = 0

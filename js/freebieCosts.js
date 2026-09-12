@@ -1,5 +1,5 @@
 import { character } from "./character.js"
-import { clans } from "./clans.js"
+import { clans } from "./VDA20data.js"
 
 export const freebieCosts = {
 	attributes: () => 5,
@@ -17,9 +17,9 @@ export const freebieCosts = {
 		const clan = clans[character.clan]
 
 		if(clan && clan.disciplines.includes(discipline)){
-			return 7   // clan
+			return 7
 		}else{
-			return 100  // foreign -- TODO: manage this correctly
+			return 100
 		}
 	},
 

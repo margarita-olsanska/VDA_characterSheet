@@ -1,110 +1,132 @@
-export const character = {
+function createDefaultCharacter(){
+	return {
 
-	name: "",
-	clan: null,
-	nature: null,
-	demeanor: null,
+		name: "",
+		clan: null,
+		nature: null,
+		demeanor: null,
+		portrait: null,
+		concept: "",
 
-	attributes: {
-		strength: 1,
-		dexterity: 1,
-		stamina: 1,
+		attributes: {
+			strength: 1,
+			dexterity: 1,
+			stamina: 1,
 
-		charisma: 1,
-		manipulation: 1,
-		composure: 1,
+			charisma: 1,
+			manipulation: 1,
+			composure: 1,
 
-		wits: 1,
-		intelligence: 1,
-		resolve: 1
-	},
+			wits: 1,
+			intelligence: 1,
+			resolve: 1
+		},
 
-	abilities: {
-		athletics: 0,
-		alertness: 0,
-		brawl: 0,
-		intimidation: 0,
-		expression: 0,
-		leadership: 0,
-		legerdemain: 0,
-		subterfuge: 0,
-		awareness: 0,
-		empathy: 0,
+		abilities: {
+			athletics: 0,
+			alertness: 0,
+			brawl: 0,
+			intimidation: 0,
+			expression: 0,
+			leadership: 0,
+			legerdemain: 0,
+			subterfuge: 0,
+			awareness: 0,
+			empathy: 0,
 
-		archery: 0,
-		commerce: 0,
-		survival: 0,
-		performance: 0,
-		ride: 0,
-		animalKen: 0,
-		crafts: 0,
-		stealth: 0,
-		melee: 0,
-		etiquette: 0,
-		
-		academics: 0,
-		law: 0,
-		medicine: 0,
-		occult: 0,
-		politics: 0,
-		investigation: 0,
-		enigmas: 0,
-		hearthWisdom: 0,
-		seneschal: 0,
-		theology: 0
-	},
+			archery: 0,
+			commerce: 0,
+			survival: 0,
+			performance: 0,
+			ride: 0,
+			animalKen: 0,
+			crafts: 0,
+			stealth: 0,
+			melee: 0,
+			etiquette: 0,
 
-	disciplines: {
-		slot1: { name: null, level: 0 },
-		slot2: { name: null, level: 0 },
-		slot3: { name: null, level: 0 }
-	},
+			academics: 0,
+			law: 0,
+			medicine: 0,
+			occult: 0,
+			politics: 0,
+			investigation: 0,
+			enigmas: 0,
+			hearthWisdom: 0,
+			seneschal: 0,
+			theology: 0
+		},
 
-	customAbilities: {},
+		disciplines: {
+			slot1: { name: null, level: 0 },
+			slot2: { name: null, level: 0 },
+			slot3: { name: null, level: 0 }
+		},
 
-	backgrounds: {
-		background1: { type: null, level: 0 },
-		background2: { type: null, level: 0 },
-		background3: { type: null, level: 0 },
-		background4: { type: null, level: 0 },
-		background5: { type: null, level: 0 }
-	},
+		customAbilities: {},
 
-	sireNotes: "",
-	disciplineCards: {},
+		backgrounds: {
+			background1: { type: null, level: 0 },
+			background2: { type: null, level: 0 },
+			background3: { type: null, level: 0 },
+			background4: { type: null, level: 0 },
+			background5: { type: null, level: 0 }
+		},
 
-	virtues: {
-		virtue1: 1,
-		virtue2: 1,
-		virtue3: 1
-	},
+		sireNotes: "",
+		clanFlaw: "",
+		notes: "",
+		disciplineCards: {},
 
-	road: {
-		type: null,
-		level: 1
-	},
+		pathCards: {},
+		ritualCards: {},
 
-	willpower: {
-		level: 1,
-		current: 1
-	},
+		virtues: {
+			virtue1: 1,
+			virtue2: 1,
+			virtue3: 1
+		},
 
-	generation: 12,
+		virtueChoices: {
+			virtue1: "conscience",
+			virtue2: "selfControl"
+		},
 
-	blood: {
-		max: 11,
-		current: 10
-	},
+		road: {
+			type: null,
+			level: 1
+		},
 
-	healthPoints: 0,
-	maxHealthPoints: 1,
+		willpower: {
+			level: 1,
+			current: 1
+		},
 
-	xp: 0,
-	freebie: 0,
+		generation: 12,
 
-	creation: {
-		active: true,
-		stage: "attributes",
+		blood: {
+			max: 11,
+			current: 10
+		},
+
+		health: ["", "", "", "", "", "", ""],
+
+		xp: 0,
+		freebie: 15,
+
+		creation: {
+			active: true,
+			stage: "attributes"
+		}
 	}
 }
 
+export const character = createDefaultCharacter()
+
+export function resetCharacter(){
+
+	const fresh = createDefaultCharacter()
+
+	for(const key in character) delete character[key]
+	Object.assign(character, fresh)
+}
