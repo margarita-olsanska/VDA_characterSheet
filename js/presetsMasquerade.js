@@ -63,7 +63,7 @@ export const abilityTypes = {
 
 	academics: { name: { ru: "Гуманитарные науки", en: "Academics" }, category: "knowledges" },
 	computer: { name: { ru: "Информатика", en: "Computer" }, category: "knowledges" },
-	electronics: { name: { ru: "Электроника", en: "Electronics" }, category: "knowledges" },
+	technology: { name: { ru: "Технология", en: "Technology" }, category: "knowledges" },
 	finance: { name: { ru: "Финансы", en: "Finance" }, category: "knowledges" },
 	investigation: { name: { ru: "Расследование", en: "Investigation" }, category: "knowledges" },
 	law: { name: { ru: "Законы", en: "Law" }, category: "knowledges" },

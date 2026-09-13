@@ -542,9 +542,9 @@ export const attributeTypes = {
 	charisma: { name: { ru: "Обаяние", en: "Charisma" }, attributeCategory: "social" },
 	manipulation: { name: { ru: "Манипуляция", en: "Manipulation" }, attributeCategory: "social" },
 	composure: { name: { ru: "Привлекательность", en: "Composure" }, attributeCategory: "social" },
-	wits: { name: { ru: "Восприятие", en: "Wits" }, attributeCategory: "mental" },
+	wits: { name: { ru: "Восприятие", en: "Perception" }, attributeCategory: "mental" },
 	intelligence: { name: { ru: "Интеллект", en: "Intelligence" }, attributeCategory: "mental" },
-	resolve: { name: { ru: "Смекалка", en: "Resolve" }, attributeCategory: "mental" }
+	resolve: { name: { ru: "Смекалка", en: "Wits" }, attributeCategory: "mental" }
 }
 
 export const abilityTypes = {
